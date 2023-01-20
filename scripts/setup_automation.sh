@@ -1,12 +1,5 @@
 #!/bin/sh
 
-# saves mac address to ~/wptagent-automation/mac
-bash ~/wptagent-automation/scripts/save_mac.sh
-
-# install wptagent
-# sed -i 's/00:00:00:00:00:00/$(cat ~/wptagent-automation/mac)/' ~/wptagent-automation/scripts/debian.sh
-# bash ~/wptagent-automation/scripts/debian.sh
-
 # using custom files
 python3 ~/wptagent-automation/scripts/setup_webpagetest_files.py
 
@@ -38,10 +31,14 @@ pip3 install pandas
 cd ~/wptagent-automation/scripts/puppeteer/puppeteer_navigation
 sudo npm install puppeteer@17.0.0 puppeteer-core@1.20.0 puppeteer-extra@3.3.4 puppeteer-extra-plugin-adblocker@2.13.5 chromium@3.0.3
 
+collectionServerUrl=$(cat ~/wptagent-automation/collection_server_url)
+collectionServerUser=$(cat ~/wptagent-automation/collection_server_user)
+collectionServerSshPort=$(cat ~/wptagent-automation/collection_server_ssh_port)
+
 # configure ssh
 sudo apt install -y sshpass
 ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
-sshpass -f ~/wptagent-automation/sueste_password ssh-copy-id -i ~/.ssh/id_rsa -p 36022 localuser@sueste.land.ufrj.br
+sshpass -f ~/wptagent-automation/collection_server_password ssh-copy-id -i ~/.ssh/id_rsa -p $collectionServerSshPort $collectionServerUser@$collectionServerUrl
 sudo systemctl enable ssh
 sudo systemctl start ssh
 

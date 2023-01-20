@@ -5,8 +5,12 @@ statusFile="~/wptagent-automation/status"
 macFile="~/wptagent-automation/mac"
 wptOngoingFile="~/wptagent-automation/wpt_ongoing"
 
-scp -o StrictHostKeyChecking=no -P 36022 localuser@sueste.land.ufrj.br:~/wpt_control/status/$(cat $macFile) ./status_temp >/dev/null 2>&1 
-scp -o StrictHostKeyChecking=no -P 36022 localuser@sueste.land.ufrj.br:~/wpt_control/status/$(cat $macFile)_ongoing $wptOngoingFile >/dev/null 2>&1 
+collectionServerUrl=$(cat ~/wptagent-automation/collection_server_url)
+collectionServerUser=$(cat ~/wptagent-automation/collection_server_user)
+collectionServerSshPort=$(cat ~/wptagent-automation/collection_server_ssh_port)
+
+scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile) ./status_temp >/dev/null 2>&1 
+scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile)_ongoing $wptOngoingFile >/dev/null 2>&1 
 
 if [[ ! -f ./status_temp ]]; then
 	exit

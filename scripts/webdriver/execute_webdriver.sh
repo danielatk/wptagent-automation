@@ -41,12 +41,16 @@ Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile /dev/nu
 echo "$(date +%s) | execute WEBDRIVER -> setup time" >> $logFile
 args="$(python3 $setupFilePath False 2>> $logFile)"
 
+collectionServerUrl=$(cat ~/wptagent-automation/collection_server_url)
+collectionServerUser=$(cat ~/wptagent-automation/collection_server_user)
+collectionServerSshPort=$(cat ~/wptagent-automation/collection_server_ssh_port)
+
 echo $args > ./tmp
 statusArgs=$(sed 's/[^ ]* //' ./tmp)
 rm ./tmp
 echo "$(date +%s) | puppeteer $statusArgs" > $statusFile
-scp -o StrictHostKeyChecking=no -P 36022 $statusFile localuser@sueste.land.ufrj.br:~/wpt_control/status/$(cat $macFile) >/dev/null 2>&1
-scp -o StrictHostKeyChecking=no -P 36022 $ongoingFilePath localuser@sueste.land.ufrj.br:~/wpt_control/status/$(cat $macFile)_ongoing_client >/dev/null 2>&1
+scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $statusFile $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile) >/dev/null 2>&1
+scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ongoingFilePath $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile)_ongoing_client >/dev/null 2>&1
 
 echo "$(date +%s) | execute WEBDRIVER -> navigation time ($args)" >> $logFile
 python3 $navigationFilePath $args 2>> $logFile
@@ -55,4 +59,4 @@ echo "-------------------" >> $logFile
 
 echo "0" > $ongoingFilePath
 
-scp -o StrictHostKeyChecking=no -P 36022 $ongoingFilePath localuser@sueste.land.ufrj.br:~/wpt_control/status/$(cat $macFile)_ongoing_client >/dev/null 2>&1
+scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ongoingFilePath $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile)_ongoing_client >/dev/null 2>&1

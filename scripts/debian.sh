@@ -23,9 +23,9 @@
 
 set -eu
 : ${DISABLE_IPV6:='n'}
-: ${WPT_SERVER:='ibiza.land.ufrj.br'}
-: ${WPT_LOCATION:='e45f01963c21'}
-: ${WPT_KEY:='landufrj123'}
+: ${WPT_SERVER:=$(cat ~/wptagent-automation/wptserver_url)}
+: ${WPT_LOCATION:='00:00:00:00:00:00'}
+: ${WPT_KEY:=$(cat ~/wptagent-automation/wptagent_key)}
 : ${WPT_CLOUD:=''}
 : ${AGENT_MODE:='desktop'}
 : ${WPT_UPDATE_OS:='y'}
@@ -40,7 +40,7 @@ set -eu
 : ${WPT_OPERA:='n'}
 : ${WPT_VIVALDI:='n'}
 : ${LINUX_DISTRO:=`(lsb_release -is)`}
-: ${WPT_DEVICE_NAME:='RPi2'}
+: ${WPT_DEVICE_NAME:='00:00:00:00:00:00'}
 : ${WPT_INTERACTIVE:='n'}
 if [ "${WPT_INTERACTIVE,,}" == 'y' ]; then
     : ${WPT_BRANCH:='master'}
