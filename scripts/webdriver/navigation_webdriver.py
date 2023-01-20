@@ -5,10 +5,10 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import sys
 
-extensao_coleta = '/home/pi/Documents/extensions/ATF-chrome-plugin/'
-extensao_adblock = '/home/pi/Documents/extensions/adblock/'
-extensao_adblock_crx = '/home/pi/Documents/extensions/adblock.crx'
-arquivo_log = '/home/pi/Documents/log_webdriver'
+extensao_coleta = '~/wptagent-automation/extensions/ATF-chrome-plugin/'
+extensao_adblock = '~/wptagent-automation/extensions/adblock/'
+extensao_adblock_crx = '~/wptagent-automation/extensions/adblock.crx'
+arquivo_log = '~/wptagent-automation/log_webdriver'
 
 def main():
     args = sys.argv

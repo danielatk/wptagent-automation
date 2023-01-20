@@ -2,7 +2,7 @@
 
 import random
 
-lista_ufs = '/home/pi/Documents/lista_ufs'
+lista_ufs = '~/wptagent-automation/lista_ufs'
 
 def readFromUFs() :
     with open(lista_ufs, 'r') as f :

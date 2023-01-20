@@ -3,8 +3,8 @@
 import os
 
 
-chrome_desktop = '/home/pi/wptagent/internal/chrome_desktop.py'
-webpagetest = '/home/pi/wptagent/internal/webpagetest.py'
+chrome_desktop = '~/wptagent/internal/chrome_desktop.py'
+webpagetest = '~/wptagent/internal/webpagetest.py'
 
 
 def modifica_chrome_desktop() :
@@ -17,7 +17,7 @@ def modifica_chrome_desktop() :
         for line in lines:
             strippedLine = line.strip('\n')
             if strippedLine == "]" and hasChecked == False:
-                file.write("    #'--load-extension=/home/pi/Documents/extensions/adblock'\n")
+                file.write("    #'--load-extension=~/wptagent-automation/extensions/adblock'\n")
                 file.write(line)
                 hasChecked = True
             else:

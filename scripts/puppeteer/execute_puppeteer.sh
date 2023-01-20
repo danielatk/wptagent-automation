@@ -1,14 +1,14 @@
 #!/bin/bash
 
-setupFilePath="/home/pi/Documents/scripts/setup_navigation.py"
-navigationFilePath="/home/pi/Documents/scripts/puppeteer/puppeteer_navigation/navigation_puppeteer.js"
-ongoingFilePath="/home/pi/Documents/ongoing"
-wptOngoingFilePath="/home/pi/Documents/wpt_ongoing"
-schedulerFilePath="/home/pi/Documents/scripts/puppeteer/schedule_puppeteer.sh"
-logFile="/home/pi/Documents/log_puppeteer"
-macFile="/home/pi/Documents/mac"
-statusFile="/home/pi/Documents/status"
-statusControlScript="/home/pi/Documents/scripts/status/status_control.sh"
+setupFilePath="~/wptagent-automation/scripts/setup_navigation.py"
+navigationFilePath="~/wptagent-automation/scripts/puppeteer/puppeteer_navigation/navigation_puppeteer.js"
+ongoingFilePath="~/wptagent-automation/ongoing"
+wptOngoingFilePath="~/wptagent-automation/wpt_ongoing"
+schedulerFilePath="~/wptagent-automation/scripts/puppeteer/schedule_puppeteer.sh"
+logFile="~/wptagent-automation/log_puppeteer"
+macFile="~/wptagent-automation/mac"
+statusFile="~/wptagent-automation/status"
+statusControlScript="~/wptagent-automation/scripts/status/status_control.sh"
 
 if [ -f $ongoingFilePath ]; then
         ongoing=$(cat $ongoingFilePath)

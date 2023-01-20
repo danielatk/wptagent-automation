@@ -1,8 +1,8 @@
 #!/bin/bash
 
-timestampFile="/home/pi/Documents/timestamp_puppeteer"
-executionFilePath="/home/pi/Documents/scripts/puppeteer/execute_puppeteer.sh"
-logFile="/home/pi/Documents/log_puppeteer"
+timestampFile="~/wptagent-automation/timestamp_puppeteer"
+executionFilePath="~/wptagent-automation/scripts/puppeteer/execute_puppeteer.sh"
+logFile="~/wptagent-automation/log_puppeteer"
 
 # before checking sleep a random ammount of time
 # (from 0 to 30 seconds in milliseconds granularity)

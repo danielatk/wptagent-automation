@@ -1,13 +1,13 @@
 #!/bin/bash
 
-measureFilePath="/home/pi/Documents/scripts/ndt/measure_ndt.sh"
-ongoingFilePath="/home/pi/Documents/ongoing"
-wptOngoingFilePath="/home/pi/Documents/wpt_ongoing"
-schedulerFilePath="/home/pi/Documents/scripts/ndt/schedule_ndt.sh"
-logFile="/home/pi/Documents/log_ndt"
-macFile="/home/pi/Documents/mac"
-statusFile="/home/pi/Documents/status"
-statusControlScript="/home/pi/Documents/scripts/status/status_control.sh"
+measureFilePath="~/wptagent-automation/scripts/ndt/measure_ndt.sh"
+ongoingFilePath="~/wptagent-automation/ongoing"
+wptOngoingFilePath="~/wptagent-automation/wpt_ongoing"
+schedulerFilePath="~/wptagent-automation/scripts/ndt/schedule_ndt.sh"
+logFile="~/wptagent-automation/log_ndt"
+macFile="~/wptagent-automation/mac"
+statusFile="~/wptagent-automation/status"
+statusControlScript="~/wptagent-automation/scripts/status/status_control.sh"
 
 if [ -f $ongoingFilePath ]; then
 	ongoing=$(cat $ongoingFilePath)

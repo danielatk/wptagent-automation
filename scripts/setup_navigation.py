@@ -6,11 +6,11 @@ import pandas as pd
 import sys
 
 
-extensao_coleta = '/home/pi/Documents/extensions/ATF-chrome-plugin/'
-arquivo_controle_mudanca = '/home/pi/Documents/mac_change'
-arquivo_mac = '/home/pi/Documents/mac'
-alexa_top_100_brasil = '/home/pi/Documents/top_100_brasil.csv'
-alexa_top_100 = '/home/pi/Documents/top-100'
+extensao_coleta = '~/wptagent-automation/extensions/ATF-chrome-plugin/'
+arquivo_controle_mudanca = '~/wptagent-automation/mac_change'
+arquivo_mac = '~/wptagent-automation/mac'
+alexa_top_100_brasil = '~/wptagent-automation/top_100_brasil.csv'
+alexa_top_100 = '~/wptagent-automation/top-100'
 
 
 def modifica_extensao() :

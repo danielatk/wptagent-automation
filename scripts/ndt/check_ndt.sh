@@ -1,8 +1,8 @@
 #!/bin/bash
 
-timestampFile="/home/pi/Documents/timestamp_ndt"
-executionFilePath="/home/pi/Documents/scripts/ndt/execute_ndt.sh"
-logFile="/home/pi/Documents/log_ndt"
+timestampFile="~/wptagent-automation/timestamp_ndt"
+executionFilePath="~/wptagent-automation/scripts/ndt/execute_ndt.sh"
+logFile="~/wptagent-automation/log_ndt"
 
 # before checking sleep a random ammount of time
 # (from 0 to 30 seconds in milliseconds granularity)
