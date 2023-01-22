@@ -16,6 +16,8 @@ For the webpage visits and video reproductions two factors are varied:
 
 For webpage visits a list of top 100 webpages visited in Brazil is used. For videos a list of 147 videos with 4K option is given. These can be easily customized.
 
+The NDT and traceroute results are sent via SSH and the ATF estimation plugin results are sent via XML to a node server.
+
 ## Deployment:
 
 To setup the environment variables and the WebPageTest agent, download the initial setup script with the following command:
