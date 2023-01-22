@@ -6,7 +6,6 @@ from selenium.webdriver.chrome.options import Options
 import sys
 
 extensao_coleta = '~/wptagent-automation/extensions/ATF-chrome-plugin/'
-extensao_adblock = '~/wptagent-automation/extensions/adblock/'
 extensao_adblock_crx = '~/wptagent-automation/extensions/adblock.crx'
 arquivo_log = '~/wptagent-automation/log_webdriver'
 

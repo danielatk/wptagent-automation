@@ -3,7 +3,6 @@
 echo "Setting up custom ATF-chrome-plugin"
 
 # setup of custom ATF-chrome-plugin
-mkdir ~/wptagent-automation/extensions
 git clone https://github.com/danielatk/ATF-chrome-plugin ~/wptagent-automation/extensions/ATF-chrome-plugin
 
 echo "Setting up custom WPTagent files"
