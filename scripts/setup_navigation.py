@@ -9,13 +9,19 @@ import sys
 extensao_coleta = '~/wptagent-automation/extensions/ATF-chrome-plugin/'
 arquivo_controle_mudanca = '~/wptagent-automation/mac_change'
 arquivo_mac = '~/wptagent-automation/mac'
+arquivo_porta_node = '~/wptagent-automation/collection_server_node_port'
+arquivo_url_servidor = '~/wptagent-automation/collection_server_url'
 alexa_top_100_brasil = '~/wptagent-automation/top_100_brasil.csv'
 alexa_top_100 = '~/wptagent-automation/top-100'
 
 
 def modifica_extensao() :
-    with open(arquivo_mac, 'r') as mac_file:
-        mac = mac_file.read().rstrip()
+    with open(arquivo_mac, 'r') as f:
+        mac = f.read().rstrip()
+    with open(arquivo_porta_node, 'r') as f:
+        porta_node = f.read().rstrip()
+    with open(arquivo_url_servidor, 'r') as f:
+        url_servidor = f.read().rstrip()
 
     for filename in os.listdir(extensao_coleta):
         f = os.path.join(extensao_coleta,filename)
@@ -24,6 +30,8 @@ def modifica_extensao() :
                 filedata = file.read()
 
                 filedata = filedata.replace(b'00:00:00:00:00:00', bytes(mac, 'UTF-8'))
+                filedata = filedata.replace(b'0.0.0.0', bytes(url_servidor, 'UTF-8'))
+                filedata = filedata.replace(b'65535', bytes(porta_node, 'UTF-8'))
 
             with open(f, 'wb') as file:
                 file.write(filedata)
