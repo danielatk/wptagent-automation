@@ -23,6 +23,7 @@ def main():
     # opções do chrome
     chrome_options = Options()
     chrome_options.add_argument("--kiosk")
+    chrome_options.add_argument("--incognito")
     extensoes = extensao_coleta
     if (args[2] == 'True') :
         # add adblock extension
