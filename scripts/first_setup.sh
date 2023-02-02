@@ -48,7 +48,7 @@ echo "Saving WebPageTest agent MAC address, which will be it's collection ID."
 # saves mac address to /home/pi/wptagent-automation/mac
 bash /home/pi/wptagent-automation/scripts/save_mac.sh
 mac=$(cat /home/pi/wptagent-automation/mac)
-sed -i 's/00:00:00:00:00:00/$mac/' /home/pi/wptagent-automation/scripts/debian.sh
+sed -i "s/00:00:00:00:00:00/$mac/" /home/pi/wptagent-automation/scripts/debian.sh
 
 echo "Installing WPTagent."
 
