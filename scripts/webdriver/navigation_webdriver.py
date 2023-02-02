@@ -5,9 +5,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import sys
 
-extensao_coleta = '~/wptagent-automation/extensions/ATF-chrome-plugin/'
-extensao_adblock_crx = '~/wptagent-automation/extensions/adblock.crx'
-arquivo_log = '~/wptagent-automation/log_webdriver'
+extensao_coleta = '/home/pi/wptagent-automation/extensions/ATF-chrome-plugin/'
+extensao_adblock_crx = '/home/pi/wptagent-automation/extensions/adblock.crx'
+arquivo_log = '/home/pi/wptagent-automation/log_webdriver'
 
 def main():
     args = sys.argv

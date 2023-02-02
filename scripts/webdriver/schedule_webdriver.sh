@@ -1,8 +1,8 @@
 #!/bin/bash
 
-randomGeneratorFile="~/wptagent-automation/scripts/generate_exponential.py"
-timestampFile="~/wptagent-automation/timestamp_webdriver"
-logFile="~/wptagent-automation/log_webdriver"
+randomGeneratorFile="/home/pi/wptagent-automation/scripts/generate_exponential.py"
+timestampFile="/home/pi/wptagent-automation/timestamp_webdriver"
+logFile="/home/pi/wptagent-automation/log_webdriver"
 
 # timestamp in milliseconds
 timestamp=$(($(date +%s%N)/1000000))

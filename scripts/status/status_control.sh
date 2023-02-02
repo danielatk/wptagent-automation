@@ -1,13 +1,13 @@
 #!/bin/bash
 
-updateStatusFile="~/wptagent-automation/scripts/status/update_status.py"
-statusFile="~/wptagent-automation/status"
-macFile="~/wptagent-automation/mac"
-wptOngoingFile="~/wptagent-automation/wpt_ongoing"
+updateStatusFile="/home/pi/wptagent-automation/scripts/status/update_status.py"
+statusFile="/home/pi/wptagent-automation/status"
+macFile="/home/pi/wptagent-automation/mac"
+wptOngoingFile="/home/pi/wptagent-automation/wpt_ongoing"
 
-collectionServerUrl=$(cat ~/wptagent-automation/collection_server_url)
-collectionServerUser=$(cat ~/wptagent-automation/collection_server_user)
-collectionServerSshPort=$(cat ~/wptagent-automation/collection_server_ssh_port)
+collectionServerUrl=$(cat /home/pi/wptagent-automation/collection_server_url)
+collectionServerUser=$(cat /home/pi/wptagent-automation/collection_server_user)
+collectionServerSshPort=$(cat /home/pi/wptagent-automation/collection_server_ssh_port)
 
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile) ./status_temp >/dev/null 2>&1 
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile)_ongoing $wptOngoingFile >/dev/null 2>&1 

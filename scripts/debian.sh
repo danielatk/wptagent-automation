@@ -23,9 +23,9 @@
 
 set -eu
 : ${DISABLE_IPV6:='n'}
-: ${WPT_SERVER:=$(cat ~/wptagent-automation/wptserver_url)}
+: ${WPT_SERVER:=$(cat /home/pi/wptagent-automation/wptserver_url)}
 : ${WPT_LOCATION:='00:00:00:00:00:00'}
-: ${WPT_KEY:=$(cat ~/wptagent-automation/wptagent_key)}
+: ${WPT_KEY:=$(cat /home/pi/wptagent-automation/wptagent_key)}
 : ${WPT_CLOUD:=''}
 : ${AGENT_MODE:='desktop'}
 : ${WPT_UPDATE_OS:='y'}

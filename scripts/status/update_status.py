@@ -3,8 +3,8 @@
 import os
 
 
-extensao_coleta = '~/wptagent-automation/extensions/ATF-chrome-plugin/'
-arquivo_status = '~/wptagent-automation/status'
+extensao_coleta = '/home/pi/wptagent-automation/extensions/ATF-chrome-plugin/'
+arquivo_status = '/home/pi/wptagent-automation/status'
 arquivo_chrome = '~/wptagent/internal/chrome_desktop.py'
 arquivo_webpagetest = '~/wptagent/internal/webpagetest.py'
 

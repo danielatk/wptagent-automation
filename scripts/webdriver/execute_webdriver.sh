@@ -1,14 +1,14 @@
 #!/bin/bash
 
-setupFilePath="~/wptagent-automation/scripts/setup_navigation.py"
-navigationFilePath="~/wptagent-automation/scripts/webdriver/navigation_webdriver.py"
-ongoingFilePath="~/wptagent-automation/ongoing"
-wptOngoingFilePath="~/wptagent-automation/wpt_ongoing"
-schedulerFilePath="~/wptagent-automation/scripts/webdriver/schedule_webdriver.sh"
-logFile="~/wptagent-automation/log_webdriver"
-macFile="~/wptagent-automation/mac"
-statusFile="~/wptagent-automation/status"
-statusControlScript="~/wptagent-automation/scripts/status/status_control.sh"
+setupFilePath="/home/pi/wptagent-automation/scripts/setup_navigation.py"
+navigationFilePath="/home/pi/wptagent-automation/scripts/webdriver/navigation_webdriver.py"
+ongoingFilePath="/home/pi/wptagent-automation/ongoing"
+wptOngoingFilePath="/home/pi/wptagent-automation/wpt_ongoing"
+schedulerFilePath="/home/pi/wptagent-automation/scripts/webdriver/schedule_webdriver.sh"
+logFile="/home/pi/wptagent-automation/log_webdriver"
+macFile="/home/pi/wptagent-automation/mac"
+statusFile="/home/pi/wptagent-automation/status"
+statusControlScript="/home/pi/wptagent-automation/scripts/status/status_control.sh"
 
 if [ -f $ongoingFilePath ]; then
         ongoing=$(cat $ongoingFilePath)
@@ -36,14 +36,14 @@ echo "$(date +%s) | execute WEBDRIVER -> scheduling time" >> $logFile
 
 # run dummy Xserver in background
 export DISPLAY=:2
-Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile /dev/null -config ~/Documents/xorg.conf :2 &
+Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile /dev/null -config /home/pi/wptagent-automation/xorg.conf :2 &
 
 echo "$(date +%s) | execute WEBDRIVER -> setup time" >> $logFile
 args="$(python3 $setupFilePath False 2>> $logFile)"
 
-collectionServerUrl=$(cat ~/wptagent-automation/collection_server_url)
-collectionServerUser=$(cat ~/wptagent-automation/collection_server_user)
-collectionServerSshPort=$(cat ~/wptagent-automation/collection_server_ssh_port)
+collectionServerUrl=$(cat /home/pi/wptagent-automation/collection_server_url)
+collectionServerUser=$(cat /home/pi/wptagent-automation/collection_server_user)
+collectionServerSshPort=$(cat /home/pi/wptagent-automation/collection_server_ssh_port)
 
 echo $args > ./tmp
 statusArgs=$(sed 's/[^ ]* //' ./tmp)

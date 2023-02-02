@@ -17,7 +17,7 @@ def modifica_chrome_desktop() :
         for line in lines:
             strippedLine = line.strip('\n')
             if strippedLine == "]" and hasChecked == False:
-                file.write("    #'--load-extension=~/wptagent-automation/extensions/adblock'\n")
+                file.write("    #'--load-extension=/home/pi/wptagent-automation/extensions/adblock'\n")
                 file.write(line)
                 hasChecked = True
             else:

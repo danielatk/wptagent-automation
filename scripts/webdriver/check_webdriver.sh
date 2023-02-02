@@ -1,8 +1,8 @@
 #!/bin/bash
 
-timestampFile="~/wptagent-automation/timestamp_webdriver"
-executionFilePath="~/wptagent-automation/scripts/webdriver/execute_webdriver.sh"
-logFile="~/wptagent-automation/log_webdriver"
+timestampFile="/home/pi/wptagent-automation/timestamp_webdriver"
+executionFilePath="/home/pi/wptagent-automation/scripts/webdriver/execute_webdriver.sh"
+logFile="/home/pi/wptagent-automation/log_webdriver"
 
 # before checking sleep a random ammount of time
 # (from 0 to 30 seconds in milliseconds granularity)

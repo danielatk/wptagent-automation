@@ -1,13 +1,13 @@
 #!/bin/bash
 
-measureFilePath="~/wptagent-automation/scripts/ndt/measure_ndt.sh"
-ongoingFilePath="~/wptagent-automation/ongoing"
-wptOngoingFilePath="~/wptagent-automation/wpt_ongoing"
-schedulerFilePath="~/wptagent-automation/scripts/ndt/schedule_ndt.sh"
-logFile="~/wptagent-automation/log_ndt"
-macFile="~/wptagent-automation/mac"
-statusFile="~/wptagent-automation/status"
-statusControlScript="~/wptagent-automation/scripts/status/status_control.sh"
+measureFilePath="/home/pi/wptagent-automation/scripts/ndt/measure_ndt.sh"
+ongoingFilePath="/home/pi/wptagent-automation/ongoing"
+wptOngoingFilePath="/home/pi/wptagent-automation/wpt_ongoing"
+schedulerFilePath="/home/pi/wptagent-automation/scripts/ndt/schedule_ndt.sh"
+logFile="/home/pi/wptagent-automation/log_ndt"
+macFile="/home/pi/wptagent-automation/mac"
+statusFile="/home/pi/wptagent-automation/status"
+statusControlScript="/home/pi/wptagent-automation/scripts/status/status_control.sh"
 
 if [ -f $ongoingFilePath ]; then
 	ongoing=$(cat $ongoingFilePath)
@@ -30,9 +30,9 @@ fi
 
 echo "1" > $ongoingFilePath
 
-collectionServerUrl=$(cat ~/wptagent-automation/collection_server_url)
-collectionServerUser=$(cat ~/wptagent-automation/collection_server_user)
-collectionServerSshPort=$(cat ~/wptagent-automation/collection_server_ssh_port)
+collectionServerUrl=$(cat /home/pi/wptagent-automation/collection_server_url)
+collectionServerUser=$(cat /home/pi/wptagent-automation/collection_server_user)
+collectionServerSshPort=$(cat /home/pi/wptagent-automation/collection_server_ssh_port)
 
 echo "ndt" > $statusFile
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $statusFile $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile) >/dev/null 2>&1
