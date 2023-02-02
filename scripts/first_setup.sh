@@ -31,7 +31,7 @@ done
 while [[ $COLLECTION_SERVER_SSH_PORT == '' ]]; do
     read -p "Data collection server SSH port: " COLLECTION_SERVER_SSH_PORT
 done
-while [[ $COLLECTION_SERVER_SSH_PORT == '' ]]; do
+while [[ $COLLECTION_SERVER_NODE_PORT == '' ]]; do
     read -p "Data collection server node port: " COLLECTION_SERVER_NODE_PORT
 done
 
