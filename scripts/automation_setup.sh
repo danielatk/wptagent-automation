@@ -64,7 +64,7 @@ echo "Setting up cron jobs"
 # adding experiment scripts to crontab
 crontab -l > mycron
 echo "@reboot /home/pi/wptagent-automation/scripts/status/status_control_loop.sh" >> mycron
-echo "@reboot /home/pi/wptagent-automation/scripts/reset_ongoing.sh" >> mycron
+echo "@reboot rm /home/pi/wptagent-automation/ongoing" >> mycron
 echo "* * * * * sh /home/pi/wptagent-automation/scripts/ndt/check_ndt.sh" >> mycron
 echo "* * * * * sh /home/pi/wptagent-automation/scripts/puppeteer/check_puppeteer.sh" >> mycron
 echo "* * * * * sh /home/pi/wptagent-automation/scripts/webdriver/check_webdriver.sh" >> mycron
