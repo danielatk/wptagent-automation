@@ -8,8 +8,8 @@ logFile="/home/pi/wptagent-automation/log_ndt"
 timestamp=$(($(date +%s%N)/1000000))
 
 # interval in milliseconds
-# sampling from exponential distribution with 60 minutes mean
-interval="$(python3 $randomGeneratorFile 60)"
+# sampling from exponential distribution with 30 minutes mean
+interval="$(python3 $randomGeneratorFile 30)"
 
 timestampNext=$(($timestamp + $interval))
 
