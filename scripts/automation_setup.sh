@@ -32,6 +32,7 @@ echo "GOPATH=\$HOME/go" >> ~/.profile
 source ~/.profile
 
 cd /home/pi/wptagent-automation/
+mkdir ndt_data
 
 echo "Setting up NDT client"
 
