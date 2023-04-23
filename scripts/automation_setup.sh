@@ -14,9 +14,17 @@ echo "Installing and setting up golang"
 
 # install go
 sudo rm -rf /usr/bin/go
-sudo wget https://go.dev/dl/go1.19.linux-armv6l.tar.gz
-sudo tar -C /usr/local -xzf go1.19.linux-armv6l.tar.gz
-sudo rm go1.19.linux-armv6l.tar.gz
+
+LINUX_ARCH=$(uname -m)
+if [ $LINUX_ARCH = aarch64 ]; then
+    GO_SOURCE='go1.19.linux-arm64.tar.gz'
+else
+    GO_SOURCE='go1.19.linux-armv6l.tar.gz'
+fi
+
+sudo wget https://go.dev/dl/$GO_SOURCE
+sudo tar -C /usr/local -xzf $GO_SOURCE
+sudo rm $GO_SOURCE
 
 echo "PATH=\$PATH:/usr/local/go/bin" >> ~/.profile
 echo "GOPATH=\$HOME/go" >> ~/.profile

@@ -2,7 +2,7 @@
 
 #**************************************************************************************************
 # WebPageTest agent installation script for Debian-based systems.
-# Tested with Ubuntu 18.04+ and Raspbian Buster+
+# Tested with Ubuntu 18.04+ (x86_64), Raspbian Buster+ and Raspberry PI OS 64bits (Debian 11 aarch64 2023-02-21)
 # For headless operation options can be specified in the environment before launching the script:
 #**************************************************************************************************
 # DISABLE_IPV6=y WPT_CLOUD=ec2 WPT_UPDATE_OS=n bash <(curl -s https://raw.githubusercontent.com/WPO-Foundation/wptagent-install/master/debian.sh)
@@ -39,7 +39,7 @@ set -eu
 : ${WPT_EPIPHANY:='n'}
 : ${WPT_OPERA:='n'}
 : ${WPT_VIVALDI:='n'}
-: ${LINUX_DISTRO:=`(lsb_release -is)`}
+: ${LINUX_ARCH:=$(uname -m)}
 : ${WPT_DEVICE_NAME:='00:00:00:00:00:00'}
 : ${WPT_INTERACTIVE:='n'}
 if [ "${WPT_INTERACTIVE,,}" == 'y' ]; then
@@ -151,12 +151,21 @@ done
 sudo dbus-uuidgen --ensure
 sudo fc-cache -f -v
 
-# ffmpeg (built) manually for Raspbian
-if [ "${LINUX_DISTRO}" == 'Raspbian' ]; then
+# ffmpeg (built) manually for Raspbian and Raspberry PI OS (Debian)
+if [ "${LINUX_ARCH}" = 'armv7l' ]; then
     cd ~
     git clone --depth 1 https://github.com/FFmpeg/FFmpeg.git ffmpeg
     cd ffmpeg
     ./configure --extra-ldflags="-latomic" --arch=armel --target-os=linux --enable-gpl --enable-libx264 --enable-nonfree
+    make -j4
+    sudo make install
+    cd ~
+    rm -rf ffmpeg
+elif [ "${LINUX_ARCH}" = 'aarch64' ]; then
+    cd ~
+    git clone --depth 1 https://github.com/FFmpeg/FFmpeg.git ffmpeg
+    cd ffmpeg
+    ./configure --extra-ldflags="-latomic" --arch=aarch64 --target-os=linux --enable-gpl --enable-libx264 --enable-nonfree
     make -j4
     sudo make install
     cd ~
@@ -298,7 +307,7 @@ done
 # Browser Installs
 #**************************************************************************************************
 if [ "${AGENT_MODE,,}" == 'desktop' ]; then
-    if [ "${LINUX_DISTRO}" == 'Raspbian' ]; then
+    if [ "${LINUX_ARCH}" = 'aarch64' ] || [ "${LINUX_ARCH}" = 'armv7l' ]; then
         if [ "${WPT_CHROME,,}" == 'y' ]; then
             until sudo apt -y install chromium-browser
             do
@@ -444,7 +453,7 @@ cat << _LIMITS_ | sudo tee /etc/security/limits.d/wptagent.conf
 * hard nofile 300000
 _LIMITS_
 
-if [ "${LINUX_DISTRO}" == 'Raspbian' ]; then
+if [ "${LINUX_ARCH}" = 'armv7l' ] || [ "${LINUX_ARCH}" = 'aarch64' ]; then
     # Boot options
     #echo 'dtoverlay=pi3-disable-wifi' | sudo tee -a /boot/config.txt
     echo 'dtparam=sd_overclock=100' | sudo tee -a /boot/config.txt
@@ -548,7 +557,7 @@ echo 'sleep 10' >> ~/agent.sh
 
 # Browser Certificates
 if [ "${WPT_UPDATE_BROWSERS,,}" == 'y' ]; then
-    if [ "${LINUX_DISTRO}" != 'Raspbian' ]; then
+    if [ "${LINUX_ARCH}" != 'aarch64' ] && [ "${LINUX_ARCH}" != 'armv7l' ]; then
         echo 'echo "Updating browser certificates"' >> ~/agent.sh
         if [ "${WPT_CHROME,,}" == 'y' ]; then
             echo 'wget -q -O - https://www.webpagetest.org/keys/google/linux_signing_key.pub | sudo apt-key add -' >> ~/agent.sh
@@ -597,7 +606,7 @@ elif [ "${WPT_UPDATE_BROWSERS,,}" == 'y' ]; then
     echo 'do' >> ~/agent.sh
     echo '    sleep 1' >> ~/agent.sh
     echo 'done' >> ~/agent.sh
-    if [ "${LINUX_DISTRO}" == 'Raspbian' ]; then
+    if [ "${LINUX_ARCH}" = 'aarch64' ] || [ "${LINUX_ARCH}" = 'armv7l' ]; then
         echo 'until sudo DEBIAN_FRONTEND=noninteractive apt -yq --only-upgrade install chromium-browser firefox-esr' >> ~/agent.sh
     else
         echo 'until sudo DEBIAN_FRONTEND=noninteractive apt -yq --only-upgrade -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install google-chrome-stable google-chrome-beta google-chrome-unstable firefox firefox-trunk firefox-esr firefox-geckodriver brave-browser brave-browser-beta brave-browser-dev brave-browser-nightly opera-stable opera-beta opera-developer vivaldi-stable' >> ~/agent.sh
@@ -612,7 +621,7 @@ if [ "${WPT_UPDATE_AGENT,,}" == 'y' ]; then
     echo 'sudo npm i -g lighthouse' >> ~/agent.sh
 fi
 
-if [ "${LINUX_DISTRO}" == 'Raspbian' ]; then
+if [ "${LINUX_ARCH}" = 'aarch64' ] || [ "${LINUX_ARCH}" = 'armv7l' ]; then
     echo 'sudo fstrim -v /' >> ~/agent.sh
 fi
 if [ "${AGENT_MODE,,}" == 'ios' ]; then

@@ -12,17 +12,25 @@ uf="$(python3 $sampleUfFile)"
 dateStr="$(date +%s)"
 ndt_file_path="/home/pi/wptagent-automation/ndt_data/$(cat /home/pi/wptagent-automation/mac)_${dateStr}_${uf}_ndt.json"
 traceroute_file_path="/home/pi/wptagent-automation/ndt_data/$(cat /home/pi/wptagent-automation/mac)_${dateStr}_${uf}_traceroute"
+IPV6_FAILURE=false
 if [ "$uf" == "mlab" ]; then
     /home/pi/wptagent-automation/scripts/ndt/ndt7-client -no-verify -scheme wss -format=json > $ndt_file_path
     server_fqdn="$(python3 $getServerFQDNFile $ndt_file_path)"
-    traceroute $server_fqdn > $traceroute_file_path
+    traceroute -4 $server_fqdn > "$traceroute_file_path"4
+    traceroute -6 $server_fqdn > "$traceroute_file_path"6 || IPV6_FAILURE=true
 else
     /home/pi/wptagent-automation/scripts/ndt/ndt7-client -server $uf.medidor.rnp.br:4443 -no-verify -scheme wss -format=json > $ndt_file_path
-    traceroute $uf.medidor.rnp.br > $traceroute_file_path
+    traceroute -4 $uf.medidor.rnp.br > "$traceroute_file_path"4
+    traceroute -6 $uf.medidor.rnp.br > "$traceroute_file_path"6 || IPV6_FAILURE=true
 fi
 echo "measure NDT -> test completed successfully" >> $logFile
-scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ndt_file_path $traceroute_file_path $collectionServerUser@$collectionServerUrl:~/wptagent-control/ndt_data/
+if [ IPV6_FAILURE = false ]; then
+    scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ndt_file_path "$traceroute_file_path"4 "$traceroute_file_path"6 $collectionServerUser@$collectionServerUrl:~/wptagent-control/ndt_data/
+else
+    scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ndt_file_path "$traceroute_file_path"4 $collectionServerUser@$collectionServerUrl:~/wptagent-control/ndt_data/
+fi
 echo "measure NDT -> test data sent to collection server" >> $logFile
 echo "-------------------" >> $logFile
 rm $ndt_file_path
-rm $traceroute_file_path
+rm "$traceroute_file_path"4
+rm "$traceroute_file_path"6

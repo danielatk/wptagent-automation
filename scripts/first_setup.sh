@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Cloning into wptagent-automation repository"
 
-git clone https://github.com/danielatk/wptagent-automation /home/pi/wptagent-automation
+git clone https://github.com/cleitonmoya/wptagent-automation /home/pi/wptagent-automation
 
 set -eu
 : ${WPT_SERVER:=''}
