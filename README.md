@@ -23,12 +23,12 @@ The NDT and traceroute results are sent via SSH and the ATF estimation plugin re
 To setup the environment variables and the WebPageTest agent, download the initial setup script with the following command:
 `curl https://raw.githubusercontent.com/danielatk/wptagent-automation/main/scripts/first_setup.sh > first_setup.sh`
 To run the script execute the following command:
-`sh first_setup.sh`
+`bash first_setup.sh`
 
 Note that this first setup script sets the WebPageTest agend id as the MAC address of the device. This must correspond with the the value given in the WebPageTest server `locations.ini` file or else the WPT agent will not be able to get jobs from the WPT server. Once this script has been executed, reboot the system. After this download and run the automation setup script:
 ```
 curl https://raw.githubusercontent.com/danielatk/wptagent-automation/main/scripts/automation_setup.sh > automation_setup.sh
-sh automation_setup.sh
+bash automation_setup.sh
 ```
 
 After this the client should be running the automated experiments and receiving the WPT jobs.
