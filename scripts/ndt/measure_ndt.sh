@@ -28,6 +28,7 @@ if [ IPV6_FAILURE = false ]; then
     scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ndt_file_path "$traceroute_file_path"4 "$traceroute_file_path"6 $collectionServerUser@$collectionServerUrl:~/wptagent-control/ndt_data/
 else
     scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ndt_file_path "$traceroute_file_path"4 $collectionServerUser@$collectionServerUrl:~/wptagent-control/ndt_data/
+    echo "measure NDT -> IPv6 failure, traceroute6 not sent to collection server" >> $logFile
 fi
 echo "measure NDT -> test data sent to collection server" >> $logFile
 echo "-------------------" >> $logFile
