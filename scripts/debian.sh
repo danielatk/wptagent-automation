@@ -28,9 +28,9 @@ set -eu
 : ${WPT_KEY:=$(cat /home/pi/wptagent-automation/wptagent_key)}
 : ${WPT_CLOUD:=''}
 : ${AGENT_MODE:='desktop'}
-: ${WPT_UPDATE_OS:='y'}
-: ${WPT_UPDATE_OS_NOW:='y'}
-: ${WPT_UPDATE_AGENT:='y'}
+: ${WPT_UPDATE_OS:='n'}
+: ${WPT_UPDATE_OS_NOW:='n'}
+: ${WPT_UPDATE_AGENT:='n'}
 : ${WPT_UPDATE_BROWSERS:='y'}
 : ${WPT_CHROME:='y'}
 : ${WPT_FIREFOX:='y'}
@@ -482,7 +482,7 @@ echo "PATH=$PWD/bin:$PWD/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/us
 echo 'sudo DEBIAN_FRONTEND=noninteractive apt update -yq' >> ~/startup.sh
 echo 'sudo DEBIAN_FRONTEND=noninteractive apt install ca-certificates -yq' >> ~/startup.sh
 echo 'cd ~' >> ~/startup.sh
-echo 'if [ -e first.run ]' >> ~/startup.sh
+echo 'if [ -e firstrun.sh ]' >> ~/startup.sh
 echo 'then' >> ~/startup.sh
 echo '    screen -dmS init ~/firstrun.sh' >> ~/startup.sh
 echo 'else' >> ~/startup.sh
@@ -513,7 +513,7 @@ echo 'until sudo DEBIAN_FRONTEND=noninteractive apt -yq -o Dpkg::Options::="--fo
 echo 'do' >> ~/firstrun.sh
 echo '    sleep 1' >> ~/firstrun.sh
 echo 'done' >> ~/firstrun.sh
-echo 'rm ~/first.run' >> ~/firstrun.sh
+echo 'rm ~/firstrun.sh' >> ~/firstrun.sh
 echo 'sudo reboot' >> ~/firstrun.sh
 chmod +x ~/firstrun.sh
 
@@ -696,12 +696,13 @@ chmod +x ~/agent.sh
 
 if [ "${WPT_INTERACTIVE,,}" == 'n' ]; then
 
-# Overwrite the existing user crontab
-echo "@reboot ${PWD}/startup.sh" | crontab -
+    # Overwrite the existing user crontab
+    echo "@reboot ${PWD}/startup.sh" | crontab -
 
-# Allow X to be started within the screen session
-sudo sed -i 's/allowed_users=console/allowed_users=anybody/g' /etc/X11/Xwrapper.config || true
-sudo systemctl set-default multi-user
+    # Allow X to be started within the screen session
+    sudo touch /etc/X11/Xwrapper.config
+    sudo sed -i 's/allowed_users=console/allowed_users=anybody/g' /etc/X11/Xwrapper.config || true
+    sudo systemctl set-default multi-user
 
 fi
 

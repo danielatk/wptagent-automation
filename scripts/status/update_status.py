@@ -5,8 +5,8 @@ import os
 
 extensao_coleta = '/home/pi/wptagent-automation/extensions/ATF-chrome-plugin/'
 arquivo_status = '/home/pi/wptagent-automation/status'
-arquivo_chrome = '~/wptagent/internal/chrome_desktop.py'
-arquivo_webpagetest = '~/wptagent/internal/webpagetest.py'
+arquivo_chrome = '/home/pi/wptagent/internal/chrome_desktop.py'
+arquivo_webpagetest = '/home/pi/wptagent/internal/webpagetest.py'
 
 
 def toggle_adblock(adblock_usado) :
