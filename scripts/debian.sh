@@ -138,7 +138,7 @@ curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 # Agent dependencies
 echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
 until sudo apt -y install python python3 python3-pip python3-ujson \
-        imagemagick dbus-x11 traceroute software-properties-common psmisc libnss3-tools iproute2 net-tools openvpn \
+        imagemagick dbus-x11 x11-utils traceroute software-properties-common psmisc libnss3-tools iproute2 net-tools openvpn \
         libtiff5-dev libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk \
         python3-dev libavutil-dev libmp3lame-dev libx264-dev yasm autoconf automake build-essential libass-dev libfreetype6-dev libtheora-dev \
         libtool libvorbis-dev pkg-config texi2html libtext-unidecode-perl python3-numpy python3-scipy \
@@ -702,9 +702,14 @@ if [ "${WPT_INTERACTIVE,,}" == 'n' ]; then
     # Configure X
     # Allow X to be started within the screen session
     sudo cp /home/pi/wptagent-automation/xorg.conf /etc/X11/xorg.conf
-    sudo echo "allowed_users=anybody" >> /etc/X11/xorg.conf
-    sudo echo "allowed_users=console" >> /etc/X11/xorg.conf
-    sudo systemctl set-default multi-user
+    sudo chmod go+w /etc/X11/xorg.conf
+    echo "allowed_users=anybody" >> /etc/X11/xorg.conf
+    echo "allowed_users=console" >> /etc/X11/xorg.conf
+    
+    # System initialization without GUI
+    if [ $(sudo systemctl get-default) != 'multi-user.target' ]; then
+        sudo systemctl set-default multi-user
+    fi
 
 fi
 
