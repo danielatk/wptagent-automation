@@ -538,13 +538,13 @@ if [ "${WPT_INTERACTIVE,,}" == 'y' ]; then
 
 # Agent invocation (depending on config)
 if [ "${AGENT_MODE,,}" == 'android' ]; then
-    echo "python3 ~/wptagent/wptagent.py -vvvv $NAME_OPTION --location $WPT_LOCATION $KEY_OPTION --server \"http:://$WPT_SERVER/work/\" --android" >> ~/agent.sh
+    echo "python3 $HOME/wptagent/wptagent.py -vvvv $NAME_OPTION --location $WPT_LOCATION $KEY_OPTION --server \"http:://$WPT_SERVER/work/\" --android" >> ~/agent.sh
 fi
 if [ "${AGENT_MODE,,}" == 'ios' ]; then
-    echo "python3 ~/wptagent/wptagent.py -vvvv $NAME_OPTION --location $WPT_LOCATION $KEY_OPTION --server \"http://$WPT_SERVER/work/\" --iOS" >> ~/agent.sh
+    echo "python3 $HOME/wptagent/wptagent.py -vvvv $NAME_OPTION --location $WPT_LOCATION $KEY_OPTION --server \"http://$WPT_SERVER/work/\" --iOS" >> ~/agent.sh
 fi
 if [ "${AGENT_MODE,,}" == 'desktop' ]; then
-    echo "python3 ~/wptagent/wptagent.py -vvvv --server \"http://$WPT_SERVER/work/\" --location $WPT_LOCATION $KEY_OPTION" >> ~/agent.sh
+    echo "python3 $HOME/wptagent/wptagent.py -vvvv --server \"http://$WPT_SERVER/work/\" --location $WPT_LOCATION $KEY_OPTION" >> ~/agent.sh
 fi
 
 else
@@ -699,9 +699,11 @@ if [ "${WPT_INTERACTIVE,,}" == 'n' ]; then
     # Overwrite the existing user crontab
     echo "@reboot ${PWD}/startup.sh" | crontab -
 
+    # Configure X
     # Allow X to be started within the screen session
-    sudo touch /etc/X11/Xwrapper.config
-    sudo sed -i 's/allowed_users=console/allowed_users=anybody/g' /etc/X11/Xwrapper.config || true
+    sudo cp /home/pi/wptagent-automation/xorg.conf /etc/X11/xorg.conf
+    sudo echo "allowed_users=anybody" >> /etc/X11/xorg.conf
+    sudo echo "allowed_users=console" >> /etc/X11/xorg.conf
     sudo systemctl set-default multi-user
 
 fi
