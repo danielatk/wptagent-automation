@@ -62,11 +62,12 @@ collectionServerSshPort=$(cat /home/pi/wptagent-automation/collection_server_ssh
 echo "Setting up SSH"
 
 # configure ssh
+if [ $(systemctl is-active ssh) != active ]; then
+    sudo systemctl enable ssh
+    sudo systemctl start ssh
 sudo apt install -y sshpass
 ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
 sshpass -f /home/pi/wptagent-automation/collection_server_password ssh-copy-id -i ~/.ssh/id_rsa -p $collectionServerSshPort $collectionServerUser@$collectionServerUrl
-sudo systemctl enable ssh
-sudo systemctl start ssh
 
 echo "Setting up cron jobs"
 
