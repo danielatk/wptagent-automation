@@ -37,7 +37,7 @@ fi
 echo "measure NDT -> test completed successfully" >> $logFile
 
 # send data to server
-if [ $IPV6_AVAILABLE = true ]; then
+if [ $IPV6_AVAILABLE = true ] && [ "$uf" == "mlab" ]; then
     scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ndt_file_path "$traceroute_file_path"4 "$traceroute_file_path"6 $collectionServerUser@$collectionServerUrl:~/wptagent-control/ndt_data/
     rm "$traceroute_file_path"6
 else
