@@ -702,9 +702,8 @@ if [ "${WPT_INTERACTIVE,,}" == 'n' ]; then
     # Configure X
     # Allow X to be started within the screen session
     sudo cp /home/pi/wptagent-automation/xorg.conf /etc/X11/xorg.conf
-    sudo chmod go+w /etc/X11/xorg.conf
-    echo "allowed_users=anybody" >> /etc/X11/xorg.conf
-    echo "allowed_users=console" >> /etc/X11/xorg.conf
+    # sudo chmod go+w /etc/X11/xorg.conf
+    # echo "allowed_users=anybody" >> /etc/X11/xorg.conf
     
     # System initialization without GUI
     if [ $(sudo systemctl get-default) != 'multi-user.target' ]; then
