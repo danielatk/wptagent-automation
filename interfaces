@@ -1,0 +1,13 @@
+# The loopback network interface
+auto lo
+iface lo inet loopback
+iface lo inet6 loopback
+
+# eth0 interface IPv6 with Router Advertisement, Stateless DHCPv6
+# and RFC9441 privacy = 0
+auto eth0
+iface eth0 inet dhcp
+iface eth0 inet6 auto
+	privext 0
+	accept_ra 2
+	dhcp 1
