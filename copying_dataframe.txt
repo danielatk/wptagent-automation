@@ -1,0 +1,1 @@
+sshpass -p "UfKYK3&t&h?+S8Rr" scp -p -P 36022 localuser@botafogo.land.ufrj.br:~/scripts_mysql/dataframe_sumario.pkl .
