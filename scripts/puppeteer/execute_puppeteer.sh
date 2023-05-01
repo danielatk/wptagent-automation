@@ -48,7 +48,7 @@ collectionServerSshPort=$(cat /home/pi/wptagent-automation/collection_server_ssh
 echo $args > ./tmp
 statusArgs=$(sed 's/[^ ]* //' ./tmp)
 rm ./tmp
-echo "puppeteer $statusArgs" > $statusFile
+echo "$(date +%s) | puppeteer $statusArgs" > $statusFile
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $statusFile $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile) >/dev/null 2>&1
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ongoingFilePath $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile)_ongoing_client >/dev/null 2>&1
 
