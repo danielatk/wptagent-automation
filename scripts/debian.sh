@@ -2,7 +2,7 @@
 
 #**************************************************************************************************
 # WebPageTest agent installation script for Debian-based systems.
-# Tested with Ubuntu 18.04+ and Raspbian Buster+
+# Tested with Ubuntu 18.04+ (x86_64), Raspbian Buster+ and Raspberry PI OS 64bits (Debian 11 aarch64 2023-02-21)
 # For headless operation options can be specified in the environment before launching the script:
 #**************************************************************************************************
 # DISABLE_IPV6=y WPT_CLOUD=ec2 WPT_UPDATE_OS=n bash <(curl -s https://raw.githubusercontent.com/WPO-Foundation/wptagent-install/master/debian.sh)
@@ -28,10 +28,10 @@ set -eu
 : ${WPT_KEY:=$(cat /home/pi/wptagent-automation/wptagent_key)}
 : ${WPT_CLOUD:=''}
 : ${AGENT_MODE:='desktop'}
-: ${WPT_UPDATE_OS:='y'}
-: ${WPT_UPDATE_OS_NOW:='y'}
-: ${WPT_UPDATE_AGENT:='y'}
-: ${WPT_UPDATE_BROWSERS:='y'}
+: ${WPT_UPDATE_OS:='n'}
+: ${WPT_UPDATE_OS_NOW:='n'}
+: ${WPT_UPDATE_AGENT:='n'}
+: ${WPT_UPDATE_BROWSERS:='n'}
 : ${WPT_CHROME:='y'}
 : ${WPT_FIREFOX:='y'}
 : ${WPT_BRAVE:='n'}
@@ -39,7 +39,7 @@ set -eu
 : ${WPT_EPIPHANY:='n'}
 : ${WPT_OPERA:='n'}
 : ${WPT_VIVALDI:='n'}
-: ${LINUX_DISTRO:=`(lsb_release -is)`}
+: ${LINUX_ARCH:=$(uname -m)}
 : ${WPT_DEVICE_NAME:='00:00:00:00:00:00'}
 : ${WPT_INTERACTIVE:='n'}
 if [ "${WPT_INTERACTIVE,,}" == 'y' ]; then
@@ -138,7 +138,7 @@ curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 # Agent dependencies
 echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
 until sudo apt -y install python python3 python3-pip python3-ujson \
-        imagemagick dbus-x11 traceroute software-properties-common psmisc libnss3-tools iproute2 net-tools openvpn \
+        imagemagick dbus-x11 x11-utils traceroute software-properties-common psmisc libnss3-tools iproute2 net-tools openvpn \
         libtiff5-dev libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk \
         python3-dev libavutil-dev libmp3lame-dev libx264-dev yasm autoconf automake build-essential libass-dev libfreetype6-dev libtheora-dev \
         libtool libvorbis-dev pkg-config texi2html libtext-unidecode-perl python3-numpy python3-scipy \
@@ -151,12 +151,21 @@ done
 sudo dbus-uuidgen --ensure
 sudo fc-cache -f -v
 
-# ffmpeg (built) manually for Raspbian
-if [ "${LINUX_DISTRO}" == 'Raspbian' ]; then
+# ffmpeg (built) manually for Raspbian and Raspberry PI OS (Debian)
+if [ "${LINUX_ARCH}" = 'armv7l' ]; then
     cd ~
     git clone --depth 1 https://github.com/FFmpeg/FFmpeg.git ffmpeg
     cd ffmpeg
     ./configure --extra-ldflags="-latomic" --arch=armel --target-os=linux --enable-gpl --enable-libx264 --enable-nonfree
+    make -j4
+    sudo make install
+    cd ~
+    rm -rf ffmpeg
+elif [ "${LINUX_ARCH}" = 'aarch64' ]; then
+    cd ~
+    git clone --depth 1 https://github.com/FFmpeg/FFmpeg.git ffmpeg
+    cd ffmpeg
+    ./configure --extra-ldflags="-latomic" --arch=aarch64 --target-os=linux --enable-gpl --enable-libx264 --enable-nonfree
     make -j4
     sudo make install
     cd ~
@@ -298,7 +307,7 @@ done
 # Browser Installs
 #**************************************************************************************************
 if [ "${AGENT_MODE,,}" == 'desktop' ]; then
-    if [ "${LINUX_DISTRO}" == 'Raspbian' ]; then
+    if [ "${LINUX_ARCH}" = 'aarch64' ] || [ "${LINUX_ARCH}" = 'armv7l' ]; then
         if [ "${WPT_CHROME,,}" == 'y' ]; then
             until sudo apt -y install chromium-browser
             do
@@ -444,7 +453,7 @@ cat << _LIMITS_ | sudo tee /etc/security/limits.d/wptagent.conf
 * hard nofile 300000
 _LIMITS_
 
-if [ "${LINUX_DISTRO}" == 'Raspbian' ]; then
+if [ "${LINUX_ARCH}" = 'armv7l' ] || [ "${LINUX_ARCH}" = 'aarch64' ]; then
     # Boot options
     #echo 'dtoverlay=pi3-disable-wifi' | sudo tee -a /boot/config.txt
     echo 'dtparam=sd_overclock=100' | sudo tee -a /boot/config.txt
@@ -473,7 +482,7 @@ echo "PATH=$PWD/bin:$PWD/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/us
 echo 'sudo DEBIAN_FRONTEND=noninteractive apt update -yq' >> ~/startup.sh
 echo 'sudo DEBIAN_FRONTEND=noninteractive apt install ca-certificates -yq' >> ~/startup.sh
 echo 'cd ~' >> ~/startup.sh
-echo 'if [ -e first.run ]' >> ~/startup.sh
+echo 'if [ -e firstrun.sh ]' >> ~/startup.sh
 echo 'then' >> ~/startup.sh
 echo '    screen -dmS init ~/firstrun.sh' >> ~/startup.sh
 echo 'else' >> ~/startup.sh
@@ -504,7 +513,7 @@ echo 'until sudo DEBIAN_FRONTEND=noninteractive apt -yq -o Dpkg::Options::="--fo
 echo 'do' >> ~/firstrun.sh
 echo '    sleep 1' >> ~/firstrun.sh
 echo 'done' >> ~/firstrun.sh
-echo 'rm ~/first.run' >> ~/firstrun.sh
+echo 'rm ~/firstrun.sh' >> ~/firstrun.sh
 echo 'sudo reboot' >> ~/firstrun.sh
 chmod +x ~/firstrun.sh
 
@@ -529,13 +538,13 @@ if [ "${WPT_INTERACTIVE,,}" == 'y' ]; then
 
 # Agent invocation (depending on config)
 if [ "${AGENT_MODE,,}" == 'android' ]; then
-    echo "python3 ~/wptagent/wptagent.py -vvvv $NAME_OPTION --location $WPT_LOCATION $KEY_OPTION --server \"http:://$WPT_SERVER/work/\" --android" >> ~/agent.sh
+    echo "python3 $HOME/wptagent/wptagent.py -vvvv $NAME_OPTION --location $WPT_LOCATION $KEY_OPTION --server \"http:://$WPT_SERVER/work/\" --android" >> ~/agent.sh
 fi
 if [ "${AGENT_MODE,,}" == 'ios' ]; then
-    echo "python3 ~/wptagent/wptagent.py -vvvv $NAME_OPTION --location $WPT_LOCATION $KEY_OPTION --server \"http://$WPT_SERVER/work/\" --iOS" >> ~/agent.sh
+    echo "python3 $HOME/wptagent/wptagent.py -vvvv $NAME_OPTION --location $WPT_LOCATION $KEY_OPTION --server \"http://$WPT_SERVER/work/\" --iOS" >> ~/agent.sh
 fi
 if [ "${AGENT_MODE,,}" == 'desktop' ]; then
-    echo "python3 ~/wptagent/wptagent.py -vvvv --server \"http://$WPT_SERVER/work/\" --location $WPT_LOCATION $KEY_OPTION" >> ~/agent.sh
+    echo "python3 $HOME/wptagent/wptagent.py -vvvv --server \"http://$WPT_SERVER/work/\" --location $WPT_LOCATION $KEY_OPTION" >> ~/agent.sh
 fi
 
 else
@@ -548,7 +557,7 @@ echo 'sleep 10' >> ~/agent.sh
 
 # Browser Certificates
 if [ "${WPT_UPDATE_BROWSERS,,}" == 'y' ]; then
-    if [ "${LINUX_DISTRO}" != 'Raspbian' ]; then
+    if [ "${LINUX_ARCH}" != 'aarch64' ] && [ "${LINUX_ARCH}" != 'armv7l' ]; then
         echo 'echo "Updating browser certificates"' >> ~/agent.sh
         if [ "${WPT_CHROME,,}" == 'y' ]; then
             echo 'wget -q -O - https://www.webpagetest.org/keys/google/linux_signing_key.pub | sudo apt-key add -' >> ~/agent.sh
@@ -597,7 +606,7 @@ elif [ "${WPT_UPDATE_BROWSERS,,}" == 'y' ]; then
     echo 'do' >> ~/agent.sh
     echo '    sleep 1' >> ~/agent.sh
     echo 'done' >> ~/agent.sh
-    if [ "${LINUX_DISTRO}" == 'Raspbian' ]; then
+    if [ "${LINUX_ARCH}" = 'aarch64' ] || [ "${LINUX_ARCH}" = 'armv7l' ]; then
         echo 'until sudo DEBIAN_FRONTEND=noninteractive apt -yq --only-upgrade install chromium-browser firefox-esr' >> ~/agent.sh
     else
         echo 'until sudo DEBIAN_FRONTEND=noninteractive apt -yq --only-upgrade -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install google-chrome-stable google-chrome-beta google-chrome-unstable firefox firefox-trunk firefox-esr firefox-geckodriver brave-browser brave-browser-beta brave-browser-dev brave-browser-nightly opera-stable opera-beta opera-developer vivaldi-stable' >> ~/agent.sh
@@ -612,7 +621,7 @@ if [ "${WPT_UPDATE_AGENT,,}" == 'y' ]; then
     echo 'sudo npm i -g lighthouse' >> ~/agent.sh
 fi
 
-if [ "${LINUX_DISTRO}" == 'Raspbian' ]; then
+if [ "${LINUX_ARCH}" = 'aarch64' ] || [ "${LINUX_ARCH}" = 'armv7l' ]; then
     echo 'sudo fstrim -v /' >> ~/agent.sh
 fi
 if [ "${AGENT_MODE,,}" == 'ios' ]; then
@@ -665,9 +674,10 @@ if [ "${WPT_UPDATE_OS,,}" == 'y' ]; then
     echo '    sudo apt -f install' >> ~/agent.sh
     echo '    sleep 1' >> ~/agent.sh
     echo 'done' >> ~/agent.sh
+    echo 'sudo apt -y autoremove' >> ~/agent.sh
+    echo 'sudo apt clean' >> ~/agent.sh
 fi
-echo 'sudo apt -y autoremove' >> ~/agent.sh
-echo 'sudo apt clean' >> ~/agent.sh
+
 if [ "${AGENT_MODE,,}" == 'android' ]; then
     echo 'adb reboot' >> ~/agent.sh
 fi
@@ -687,12 +697,19 @@ chmod +x ~/agent.sh
 
 if [ "${WPT_INTERACTIVE,,}" == 'n' ]; then
 
-# Overwrite the existing user crontab
-echo "@reboot ${PWD}/startup.sh" | crontab -
+    # Overwrite the existing user crontab
+    echo "@reboot ${PWD}/startup.sh" | crontab -
 
-# Allow X to be started within the screen session
-sudo sed -i 's/allowed_users=console/allowed_users=anybody/g' /etc/X11/Xwrapper.config || true
-sudo systemctl set-default multi-user
+    # Configure X
+    # Allow X to be started within the screen session (not applicable to Debian 11)
+    # sudo cp /home/pi/wptagent-automation/xorg.conf /etc/X11/xorg.conf
+    # sudo chmod go+w /etc/X11/xorg.conf
+    # echo "allowed_users=anybody" >> /etc/X11/xorg.conf
+    
+    # System initialization without GUI
+    if [ $(sudo systemctl get-default) != 'multi-user.target' ]; then
+        sudo systemctl set-default multi-user
+    fi
 
 fi
 

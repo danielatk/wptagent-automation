@@ -3,6 +3,7 @@
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import sys
 
 extensao_coleta = '/home/pi/wptagent-automation/extensions/ATF-chrome-plugin/'
@@ -22,15 +23,19 @@ def main():
 
     # opções do chrome
     chrome_options = Options()
-    chrome_options.add_argument("--kiosk")
-    chrome_options.add_argument("--incognito")
     extensoes = extensao_coleta
     if (args[2] == 'True') :
         # add adblock extension
         chrome_options.add_extension(extensao_adblock_crx)
     chrome_options.add_argument('--load-extension={}'.format(extensoes))
-    driver = webdriver.Chrome(options = chrome_options)
-
+    
+    # browser log
+    d = DesiredCapabilities.CHROME
+    d['goog:loggingPrefs'] = { 'browser':'ALL' }
+    
+    driver = webdriver.Chrome(desired_capabilities=d, options = chrome_options)
+    driver.execute_cdp_cmd("Network.setCacheDisabled", {"cacheDisabled":True})
+    
     # resolução da tela (https://gs.statcounter.com/screen-resolution-stats/desktop/worldwide)
     res1 = [1920, 1080]
     res2 = [1366, 768]
@@ -49,8 +54,11 @@ def main():
 
     with open(arquivo_log, 'a') as file :
         file.write("navigation WEBDRIVER -> test begun successfully")
-
-    time.sleep(18)
+        file.write("navigation WEBDRIVER -> browser log:")
+        for entry in driver.get_log('browser'):
+            file.write(str(entry))
+            file.write('\n\n')
+    time.sleep(120)
 
     driver.quit()
 

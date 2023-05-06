@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Setting up custom ATF-chrome-plugin"
 
@@ -14,9 +14,17 @@ echo "Installing and setting up golang"
 
 # install go
 sudo rm -rf /usr/bin/go
-sudo wget https://go.dev/dl/go1.19.linux-armv6l.tar.gz
-sudo tar -C /usr/local -xzf go1.19.linux-armv6l.tar.gz
-sudo rm go1.19.linux-armv6l.tar.gz
+
+LINUX_ARCH=$(uname -m)
+if [ $LINUX_ARCH = aarch64 ]; then
+    GO_SOURCE='go1.19.linux-arm64.tar.gz'
+else
+    GO_SOURCE='go1.19.linux-armv6l.tar.gz'
+fi
+
+sudo wget https://go.dev/dl/$GO_SOURCE
+sudo tar -C /usr/local -xzf $GO_SOURCE
+sudo rm $GO_SOURCE
 
 echo "PATH=\$PATH:/usr/local/go/bin" >> ~/.profile
 echo "GOPATH=\$HOME/go" >> ~/.profile
@@ -24,6 +32,7 @@ echo "GOPATH=\$HOME/go" >> ~/.profile
 source ~/.profile
 
 cd /home/pi/wptagent-automation/
+mkdir ndt_data
 
 echo "Setting up NDT client"
 
@@ -53,11 +62,12 @@ collectionServerSshPort=$(cat /home/pi/wptagent-automation/collection_server_ssh
 echo "Setting up SSH"
 
 # configure ssh
+if [ $(systemctl is-active ssh) != active ]; then
+    sudo systemctl enable ssh
+    sudo systemctl start ssh
 sudo apt install -y sshpass
 ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
 sshpass -f /home/pi/wptagent-automation/collection_server_password ssh-copy-id -i ~/.ssh/id_rsa -p $collectionServerSshPort $collectionServerUser@$collectionServerUrl
-sudo systemctl enable ssh
-sudo systemctl start ssh
 
 echo "Setting up cron jobs"
 
@@ -65,9 +75,9 @@ echo "Setting up cron jobs"
 crontab -l > mycron
 echo "@reboot /home/pi/wptagent-automation/scripts/status/status_control_loop.sh" >> mycron
 echo "@reboot rm /home/pi/wptagent-automation/ongoing" >> mycron
-echo "* * * * * sh /home/pi/wptagent-automation/scripts/ndt/check_ndt.sh" >> mycron
-echo "* * * * * sh /home/pi/wptagent-automation/scripts/puppeteer/check_puppeteer.sh" >> mycron
-echo "* * * * * sh /home/pi/wptagent-automation/scripts/webdriver/check_webdriver.sh" >> mycron
+echo "* * * * * bash /home/pi/wptagent-automation/scripts/ndt/check_ndt.sh" >> mycron
+echo "* * * * * bash /home/pi/wptagent-automation/scripts/puppeteer/check_puppeteer.sh" >> mycron
+echo "* * * * * bash /home/pi/wptagent-automation/scripts/webdriver/check_webdriver.sh" >> mycron
 crontab mycron
 rm mycron
 

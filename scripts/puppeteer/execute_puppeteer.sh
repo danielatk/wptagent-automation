@@ -36,8 +36,9 @@ echo "$(date +%s) | execute PUPPETEER -> scheduling time" >> $logFile
 
 # run dummy Xserver in background
 export DISPLAY=:2
-Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile /dev/null -config /home/pi/wptagent-automation/xorg.conf :2 &
-
+if [ ! -f /tmp/.X2-lock ]; then
+        Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile /dev/null -config /home/pi/wptagent-automation/xorg.conf :2 &
+fi
 echo "$(date +%s) | execute PUPPETEER -> setup time" >> $logFile
 args="$(python3 $setupFilePath True 2>> $logFile)"
 

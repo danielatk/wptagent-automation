@@ -3,8 +3,8 @@
 import os
 
 
-chrome_desktop = '~/wptagent/internal/chrome_desktop.py'
-webpagetest = '~/wptagent/internal/webpagetest.py'
+chrome_desktop = '/home/pi/wptagent/internal/chrome_desktop.py'
+webpagetest = '/home/pi/wptagent/internal/webpagetest.py'
 
 
 def modifica_chrome_desktop() :

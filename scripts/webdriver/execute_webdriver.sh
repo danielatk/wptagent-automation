@@ -36,8 +36,9 @@ echo "$(date +%s) | execute WEBDRIVER -> scheduling time" >> $logFile
 
 # run dummy Xserver in background
 export DISPLAY=:2
-Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile /dev/null -config /home/pi/wptagent-automation/xorg.conf :2 &
-
+if [ ! -f /tmp/.X2-lock ]; then
+        Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile /dev/null -config /home/pi/wptagent-automation/xorg.conf :2 &
+fi
 echo "$(date +%s) | execute WEBDRIVER -> setup time" >> $logFile
 args="$(python3 $setupFilePath False 2>> $logFile)"
 
