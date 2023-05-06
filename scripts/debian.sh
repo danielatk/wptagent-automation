@@ -31,7 +31,7 @@ set -eu
 : ${WPT_UPDATE_OS:='n'}
 : ${WPT_UPDATE_OS_NOW:='n'}
 : ${WPT_UPDATE_AGENT:='n'}
-: ${WPT_UPDATE_BROWSERS:='y'}
+: ${WPT_UPDATE_BROWSERS:='n'}
 : ${WPT_CHROME:='y'}
 : ${WPT_FIREFOX:='y'}
 : ${WPT_BRAVE:='n'}
@@ -674,9 +674,10 @@ if [ "${WPT_UPDATE_OS,,}" == 'y' ]; then
     echo '    sudo apt -f install' >> ~/agent.sh
     echo '    sleep 1' >> ~/agent.sh
     echo 'done' >> ~/agent.sh
+    echo 'sudo apt -y autoremove' >> ~/agent.sh
+    echo 'sudo apt clean' >> ~/agent.sh
 fi
-echo 'sudo apt -y autoremove' >> ~/agent.sh
-echo 'sudo apt clean' >> ~/agent.sh
+
 if [ "${AGENT_MODE,,}" == 'android' ]; then
     echo 'adb reboot' >> ~/agent.sh
 fi
@@ -700,8 +701,8 @@ if [ "${WPT_INTERACTIVE,,}" == 'n' ]; then
     echo "@reboot ${PWD}/startup.sh" | crontab -
 
     # Configure X
-    # Allow X to be started within the screen session
-    sudo cp /home/pi/wptagent-automation/xorg.conf /etc/X11/xorg.conf
+    # Allow X to be started within the screen session (not applicable to Debian 11)
+    # sudo cp /home/pi/wptagent-automation/xorg.conf /etc/X11/xorg.conf
     # sudo chmod go+w /etc/X11/xorg.conf
     # echo "allowed_users=anybody" >> /etc/X11/xorg.conf
     
