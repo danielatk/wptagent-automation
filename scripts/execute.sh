@@ -90,7 +90,7 @@ echo "ndt" > $statusFile
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $statusFile $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile) >/dev/null 2>&1
 
 echo "$(date +%s) | execute NDT -> measuring time" >> $logFile
-/bin/bash $measureFilePath 2>> $logFile
+/bin/bash $ndtFilePath 2>> $logFile
 
 echo "-------------------" >> $logFile
 
