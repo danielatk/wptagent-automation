@@ -20,6 +20,15 @@ if [[ $(diff ./status_temp $statusFile) ]]; then
 	touch ./changing
 	cp ./status_temp $statusFile
 	python3 $updateStatusFile
+	# check if there's a new WPT test. If there is must trigger a traceroute test to the URL that will be tested
+	tool=$(cat $statusFile | cut -d' ' -f1)
+	if [ $tool -eq "wpt" ]; then
+		url=$(cat $statusFile | cut -d' ' -f2)
+		traceroute_file_path="./$(cat /home/pi/wptagent-automation/mac)_$(date +%s)_${url}_traceroute"
+		traceroute -4 $url > "$traceroute_file_path"4
+		scp -o StrictHostKeyChecking=no -P $collectionServerSshPort "$traceroute_file_path"4 $collectionServerUser@$collectionServerUrl:~/wptagent-control/wpt_data/
+		rm "$traceroute_file_path"4
+	fi
 	rm ./changing
 fi
 
