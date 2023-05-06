@@ -3,7 +3,6 @@
 import random
 import os
 import pandas as pd
-import sys
 
 
 extensao_coleta = '/home/pi/wptagent-automation/extensions/ATF-chrome-plugin/'
@@ -52,21 +51,6 @@ def toggle_adblock(adblock_usado) :
             file.write(filedata)
 
 
-def toggle_puppeteer(puppeteer_usado) :
-    f = os.path.join(extensao_coleta,'atfindex.js')
-    if os.path.isfile(f):
-        with open(f, 'rb') as file :
-            filedata = file.read()
-
-            if puppeteer_usado == 'False' :
-                filedata = filedata.replace(b'stats.puppeteer = true;', b'stats.puppeteer = false;')
-            else :
-                filedata = filedata.replace(b'stats.puppeteer = false;', b'stats.puppeteer = true;')
-
-        with open(f, 'wb') as file:
-            file.write(filedata)
-
-
 def toggle_resolution(resolution_type) :
     f = os.path.join(extensao_coleta,'atfindex.js')
     if os.path.isfile(f):
@@ -106,14 +90,6 @@ def chooseAtRandom(domain_list) :
 
 
 def main():
-    args = sys.argv
-
-    if (len(args) != 2) :
-        print('inform if puppeteer is being used')
-        return
-
-    toggle_puppeteer(args[1])
-
     foi_modificado = os.path.exists(arquivo_controle_mudanca)
 
     # controle para saber se o mac já foi substituído na extensão
