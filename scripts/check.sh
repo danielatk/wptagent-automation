@@ -1,8 +1,8 @@
 #!/bin/bash
 
-timestampFile="/home/pi/wptagent-automation/timestamp_ndt"
-executionFilePath="/home/pi/wptagent-automation/scripts/ndt/execute_ndt.sh"
-logFile="/home/pi/wptagent-automation/log_ndt"
+timestampFile="/home/pi/wptagent-automation/next_timestamp"
+executionFilePath="/home/pi/wptagent-automation/scripts/execute.sh"
+logFile="/home/pi/wptagent-automation/log"
 
 # before checking sleep a random ammount of time
 # (from 0 to 30 seconds in milliseconds granularity)
@@ -17,11 +17,11 @@ if [ -f $timestampFile ]; then
 	tsExecute=$(cat $timestampFile)
 	tsNow=$(($(date +%s%N)/1000000))
 	if [ $tsNow -gt $tsExecute ]; then
-		echo "$(date +%s) | check NDT -> execution time" >> $logFile
+		echo "$(date +%s) | check -> execution time" >> $logFile
 		/bin/bash $executionFilePath 2>> $logFile
 	fi
 else
-	echo "$(date +%s) | check NDT -> first execution" >> $logFile
+	echo "$(date +%s) | check -> first execution" >> $logFile
 	/bin/bash $executionFilePath 2>> $logFile
 fi
 
