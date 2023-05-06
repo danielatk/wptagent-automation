@@ -15,11 +15,3 @@ if [ BBR = y]; then
         echo 'Não foi possível habilitar o TCP BBR, por favor verifique.'
     fi
 fi
-
-# Configuração de IPv6 único
-# Desbilita o dhcpd.service e utliza apenas o networking.service
-cd ~/wptagent-automation
-cat interfaces | sudo tee -a /etc/network/interfaces
-sudo systemctl stop dhcpd
-sudo systemctl disable dhcpd
-sudo reboot
