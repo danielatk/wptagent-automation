@@ -107,8 +107,8 @@ def main():
             toggle_resolution(content[2])
 
         if content[0] == 'wpt':
-            modifica_chrome(content[1])
-            modifica_webpagetest(content[2])
+            modifica_chrome(content[2])
+            modifica_webpagetest(content[3])
 
 
 if __name__ == "__main__":
