@@ -65,9 +65,10 @@ echo "Setting up SSH"
 if [ $(systemctl is-active ssh) != active ]; then
     sudo systemctl enable ssh
     sudo systemctl start ssh
+fi
 sudo apt install -y sshpass
 ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
-sshpass -f /home/pi/wptagent-automation/collection_server_password ssh-copy-id -i ~/.ssh/id_rsa -p $collectionServerSshPort $collectionServerUser@$collectionServerUrl
+sshpass -f /home/pi/wptagent-automation/collection_server_password ssh-copy-id -o StrictHostKeyChecking=no -p $collectionServerSshPort $collectionServerUser@$collectionServerUrl
 
 echo "Setting up cron jobs"
 
@@ -75,9 +76,7 @@ echo "Setting up cron jobs"
 crontab -l > mycron
 echo "@reboot /home/pi/wptagent-automation/scripts/status/status_control_loop.sh" >> mycron
 echo "@reboot rm /home/pi/wptagent-automation/ongoing" >> mycron
-echo "* * * * * bash /home/pi/wptagent-automation/scripts/ndt/check_ndt.sh" >> mycron
-echo "* * * * * bash /home/pi/wptagent-automation/scripts/puppeteer/check_puppeteer.sh" >> mycron
-echo "* * * * * bash /home/pi/wptagent-automation/scripts/webdriver/check_webdriver.sh" >> mycron
+echo "* * * * * bash /home/pi/wptagent-automation/scripts/check.sh" >> mycron
 crontab mycron
 rm mycron
 

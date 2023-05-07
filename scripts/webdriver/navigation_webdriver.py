@@ -58,7 +58,8 @@ def main():
         for entry in driver.get_log('browser'):
             file.write(str(entry))
             file.write('\n\n')
-    time.sleep(120)
+
+    time.sleep(18)
 
     driver.quit()
 
