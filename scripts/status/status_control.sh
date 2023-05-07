@@ -22,7 +22,7 @@ if [[ $(diff ./status_temp $statusFile) ]]; then
 	python3 $updateStatusFile
 	# check if there's a new WPT test. If there is must trigger a traceroute test to the URL that will be tested
 	tool=$(cat $statusFile | cut -d' ' -f1)
-	if [ $tool -eq "wpt" ]; then
+	if [ $tool = "wpt" ]; then
 		url=$(cat $statusFile | cut -d' ' -f2)
 		if [[ $url == *"watch?v="* ]]; then
 			url="www.youtube.com"
