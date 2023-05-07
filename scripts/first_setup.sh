@@ -2,7 +2,7 @@
 
 echo "Cloning into wptagent-automation repository"
 
-git clone -b arm64 --single-branch https://github.com/cleitonmoya/wptagent-automation /home/pi/wptagent-automation
+git clone https://github.com/danielatk/wptagent-automation /home/pi/wptagent-automation
 
 set -eu
 : ${WPT_SERVER:=''}
