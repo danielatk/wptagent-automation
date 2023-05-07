@@ -65,6 +65,7 @@ echo "Setting up SSH"
 if [ $(systemctl is-active ssh) != active ]; then
     sudo systemctl enable ssh
     sudo systemctl start ssh
+fi
 sudo apt install -y sshpass
 ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
 sshpass -f /home/pi/wptagent-automation/collection_server_password ssh-copy-id -o StrictHostKeyChecking=no -p $collectionServerSshPort $collectionServerUser@$collectionServerUrl
