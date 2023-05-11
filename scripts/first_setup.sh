@@ -54,3 +54,6 @@ echo "Installing WPTagent."
 
 # install wptagent
 bash /home/pi/wptagent-automation/scripts/debian.sh
+
+# conclude instalation
+bash /home/pi/wptagent-automation/scripts/automation_setup.sh
