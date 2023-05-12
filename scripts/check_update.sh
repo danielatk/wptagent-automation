@@ -50,9 +50,6 @@ while [ $iteration -lt $max_iterations ]; do
         iteration=$((iteration + 1))
         continue
     fi
-
-    # Increment iteration counter
-    iteration=$((iteration + 1))
 done
 
 [ "$ongoing" = "1" ] && echo "$(date +%s) | check update -> ongoing local experiment" >> $logFile && echo "-------------------" >> $logFile && exit
