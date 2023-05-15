@@ -1,6 +1,6 @@
 #!/bin/bash
 
-logFile="/home/pi/wptagent-automation/log_ndt"
+logFile="/home/pi/wptagent-automation/log"
 sampleUfFile="/home/pi/wptagent-automation/scripts/ndt/sample_from_uf_list.py"
 getServerFQDNFile="/home/pi/wptagent-automation/scripts/ndt/get_server_fqdn.py"
 
