@@ -8,7 +8,7 @@ import sys
 
 extensao_coleta = '/home/pi/wptagent-automation/extensions/ATF-chrome-plugin/'
 extensao_adblock_crx = '/home/pi/wptagent-automation/extensions/adblock.crx'
-arquivo_log = '/home/pi/wptagent-automation/log_webdriver'
+arquivo_log = '/home/pi/wptagent-automation/log'
 
 def main():
     args = sys.argv
