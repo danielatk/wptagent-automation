@@ -1,9 +1,12 @@
 #!/bin/bash
 
-setupFilePath="/home/pi/wptagent-automation/scripts/setup_navigation.py"
+setupNavigationFilePath="/home/pi/wptagent-automation/scripts/setup_navigation.py"
+setupReproductionFilePath="/home/pi/wptagent-automation/scripts/setup_reproduction.py"
 togglePuppeteerFilePath="/home/pi/wptagent-automation/scripts/toggle_puppeteer.py"
-puppeteerFilePath="/home/pi/wptagent-automation/scripts/puppeteer/puppeteer_navigation/navigation_puppeteer.js"
-webdriverFilePath="/home/pi/wptagent-automation/scripts/webdriver/navigation_webdriver.py"
+puppeteerNavigationFilePath="/home/pi/wptagent-automation/scripts/puppeteer/puppeteer_navigation/navigation_puppeteer.js"
+puppeteerReproductionFilePath="/home/pi/wptagent-automation/scripts/puppeteer/puppeteer_navigation/reproduction_puppeteer.js"
+webdriverNavigationFilePath="/home/pi/wptagent-automation/scripts/webdriver/navigation_webdriver.py"
+webdriverReproductionFilePath="/home/pi/wptagent-automation/scripts/webdriver/reproduction_webdriver.py"
 ndtFilePath="/home/pi/wptagent-automation/scripts/ndt/measure_ndt.sh"
 ongoingFilePath="/home/pi/wptagent-automation/ongoing"
 wptOngoingFilePath="/home/pi/wptagent-automation/wpt_ongoing"
@@ -53,11 +56,21 @@ fi
 
 echo "$(date +%s) | execute -> setup time" >> $logFile
 
+echo "$(date +%s) | execute WPT -> setup time" >> $logFile
+coin=$[ RANDOM % 2 ]
+args=""
 # setup webdriver and puppeteer tests
-args="$(python3 $setupFilePath 2>> $logFile)"
+if [[ $coin -eq 1 ]]; then
+    args="$(python3 $setupNavigationFilePath)"
+else
+    args="$(python3 $setupReproductionFilePath)"
+fi
 
 # traceroute to url
 url=$(echo $args | cut -d' ' -f1)
+if [[ $url == *"watch?v="* ]]; then
+  url="www.youtube.com"
+fi
 if [[ $url == "http://"* ]]; then
   url=${url/http:\/\//}
 fi
@@ -76,7 +89,11 @@ echo "webdriver ${args}" > $statusFile
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $statusFile $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile) >/dev/null 2>&1
 
 echo "$(date +%s) | execute WEBDRIVER -> navigation time ($args)" >> $logFile
-python3 $webdriverFilePath $args 2>> $logFile
+if [[ $coin -eq 1 ]]; then
+    python3 $webdriverNavigationFilePath $args 2>> $logFile
+else
+    python3 $webdriverReproductionFilePath $args 2>> $logFile
+fi
 
 echo "-------------------" >> $logFile
 
@@ -87,7 +104,11 @@ echo "puppeteer ${args}" > $statusFile
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $statusFile $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile) >/dev/null 2>&1
 
 echo "$(date +%s) | execute PUPPETEER -> navigation time ($args)" >> $logFile
-node $puppeteerFilePath $args 2>> $logFile
+if [[ $coin -eq 1 ]]; then
+    node $puppeteerNavigationFilePath $args 2>> $logFile
+# else
+#     node $puppeteerReproductionFilePath $args 2>> $logFile
+fi
 
 echo "-------------------" >> $logFile
 

@@ -33,6 +33,7 @@ source ~/.profile
 
 cd /home/pi/wptagent-automation/
 mkdir ndt_data
+mkdir sfn_data
 
 echo "Setting up NDT client"
 
