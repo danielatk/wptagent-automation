@@ -12,7 +12,7 @@ collectionServerSshPort=$(cat /home/pi/wptagent-automation/collection_server_ssh
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile) ./status_temp >/dev/null 2>&1 
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile)_ongoing $wptOngoingFile >/dev/null 2>&1 
 
-if [[ ! -f ./status_temp ]]; then
+if [[ ! -f /home/pi/wptagent-automation/status_temp ]]; then
 	exit
 fi
 
@@ -41,4 +41,4 @@ if [[ $(diff ./status_temp $statusFile) ]]; then
 	rm ./changing
 fi
 
-rm ./status_temp
+rm /home/pi/wptagent-automation/status_temp
