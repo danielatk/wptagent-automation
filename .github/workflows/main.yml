@@ -1,0 +1,63 @@
+name: Main CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  ##################
+  # Boot & Release #
+  ##################
+  setup:
+    name: Boot & Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Version
+        run: |
+          VERSION=$(cat version)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Creating release notes
+        run: |
+          VERSION="${{ env.VERSION }}"
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          echo "Notas da versão $VERSION do wptagent-automation" > notes.txt
+          HAS_FIXES=$(cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".fixes | any')
+          if [ "$HAS_FIXES" == "true" ]; then
+            echo "Consertos:" >> notes.txt
+            cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".fixes[] | "- " + .' >> notes.txt
+          fi
+          HAS_IMPROVEMENTS=$(cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".improvements | any')
+          if [ "$HAS_IMPROVEMENTS" == "true" ]; then
+            echo "Melhorias:" >> notes.txt
+            cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".improvements[] | "- " + .' >> notes.txt
+          fi
+          HAS_FEATURES=$(cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".features | any')
+          if [ "$HAS_FEATURES" == "true" ]; then
+            echo "Funcionalidades:" >> notes.txt
+            cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".features[] | "- " + .' >> notes.txt
+          fi
+          echo "$(cat notes.txt)" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        id: release_notes
+
+      - name: Creating a GitHub Tag
+        uses: danielatk/github-tag-action@v1
+        with:
+          custom_tag: ${{ env.VERSION }}
+          # github_token: ${{ secrets.GITHUB_TOKEN }}
+          create_annotated_tag: true
+          annotated_tag_message: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+
+      - name: Create a GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ env.VERSION }}
+          # token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
