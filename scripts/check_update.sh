@@ -57,13 +57,14 @@ done
 [ "$wptOngoing" = "1" ] && echo "$(date +%s) | check update -> ongoing wpt experiment" >> $logFile && echo "-------------------" >> $logFile && exit
 
 echo "1" > $ongoingFilePath
-
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ongoingFilePath $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile)_ongoing_client >/dev/null 2>&1
 
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $collectionServerUser@$collectionServerUrl:~/wptagent-control/update/version $newVersionFile >/dev/null 2>&1
 
 if cmp -s $newVersionFile $versionFile; then
     # there is no new version
+    echo "0" > $ongoingFilePath
+    scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ongoingFilePath $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile)_ongoing_client >/dev/null 2>&1
     echo "$(date +%s) | check update -> no new version" >> $logFile
     echo "-------------------" >> $logFile
     exit
@@ -81,5 +82,4 @@ cp $newVersionFile $versionFile
 rm $newVersionFile
 
 echo "0" > $ongoingFilePath
-
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ongoingFilePath $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile)_ongoing_client >/dev/null 2>&1
