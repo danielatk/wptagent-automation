@@ -1,5 +1,10 @@
 #!/bin/bash
 
+collectionServerUrl=$(cat /home/pi/wptagent-automation/collection_server_url)
+collectionServerUser=$(cat /home/pi/wptagent-automation/collection_server_user)
+collectionServerSshPort=$(cat /home/pi/wptagent-automation/collection_server_ssh_port)
+macFile="/home/pi/wptagent-automation/mac"
+
 ongoing_file_path="$1"
 check_interval=10  # in seconds
 timeout=300        # 5 minutes in seconds
@@ -20,6 +25,7 @@ while true; do
             if [ $elapsed_time -ge $timeout ]; then
                 echo "Timeout reached. Changing file content to 0."
                 echo "0" > "$ongoing_file_path"
+                scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $ongoing_file_path $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile)_ongoing_client >/dev/null 2>&1
                 rm "$flag_file"
             fi
         else
