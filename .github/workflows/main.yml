@@ -30,17 +30,17 @@ jobs:
           echo "Notas da versão $VERSION do wptagent-automation" > notes.txt
           HAS_FIXES=$(cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".fixes | any')
           if [ "$HAS_FIXES" == "true" ]; then
-            echo "Consertos:" >> notes.txt
+            echo "Fixes:" >> notes.txt
             cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".fixes[] | "- " + .' >> notes.txt
           fi
           HAS_IMPROVEMENTS=$(cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".improvements | any')
           if [ "$HAS_IMPROVEMENTS" == "true" ]; then
-            echo "Melhorias:" >> notes.txt
+            echo "Improvements:" >> notes.txt
             cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".improvements[] | "- " + .' >> notes.txt
           fi
           HAS_FEATURES=$(cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".features | any')
           if [ "$HAS_FEATURES" == "true" ]; then
-            echo "Funcionalidades:" >> notes.txt
+            echo "Functionalities:" >> notes.txt
             cat ./RELEASE_NOTES.json | jq -r '."'$VERSION'".features[] | "- " + .' >> notes.txt
           fi
           echo "$(cat notes.txt)" >> $GITHUB_OUTPUT
