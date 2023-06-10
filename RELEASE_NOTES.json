@@ -12,6 +12,7 @@
 			"We fixed the ongoing reset script, which now unlocks client in the server side"
 		],
 		"improvements": [
+			"We made better release comment parsing from the release notes"
 		],
 		"features": [
 		]
