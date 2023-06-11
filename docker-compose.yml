@@ -2,20 +2,25 @@ version: "3.9"
 services:
   agent-1:
     build: .
-    hostname: worker1
-    environment:
-      QUEUE: "worker1"
-      BACKEND: "rpc://guest:guest@broker/"
-      BROKER: "amqp://guest:guest@broker/"
+    env_file:
+      - agent1.env
+    hostname: "${QUEUE}"
     depends_on:
       - broker
+#  wptagent:
+#    image: webpagetest/agent
+#    environment:
+#      SERVER_URL: ""
+#      LOCATION: ""
+#      KEY: ""
+#      NAME: ""
+#      SHAPER: ""
+#      EXTRA_ARGS: ""
   agent-2:
     build: .
-    hostname: worker2
-    environment:
-      QUEUE: "worker2"
-      BACKEND: "rpc://guest:guest@broker/"
-      BROKER: "amqp://guest:guest@broker/"
+    env_file:
+      - agent2.env
+    hostname: "${QUEUE}"
     depends_on:
       - broker 
   broker:
