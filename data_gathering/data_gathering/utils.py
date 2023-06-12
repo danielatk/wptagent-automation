@@ -1,6 +1,8 @@
 import subprocess
 import json
 
+VERSION_FILE = '/app/.env'
+
 def call_program(program):
     result = subprocess.run(program, capture_output=True)
     return result.stdout, result.stderr
@@ -19,4 +21,9 @@ def call_traceroute(server, ip_v6 = False):
     command = ['traceroute', '-6' if ip_v6 else '-4', server]
     result, _ = call_program(command)
     return result
+
+def update_system(new_version):
+    with open(VERSION_FILE, 'w') as f:
+        f.write(f'VERSION={new_version}')
+    call_program(['docker', 'compose', '-f', 'docker-compose-client.yml', 'up', '-d'])
 

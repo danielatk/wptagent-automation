@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  agent:
+    image: "carloscdias/data_gathering:${VERSION}"
+    env_file:
+      - data_gathering_agent.env
+    environment:
+      VERSION: "${VERSION}"
+    volumes:
+      - .env:/app/.env
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  wptagent:
+    image: webpagetest/agent
+    env_file:
+      - wpa_agent.env
+
