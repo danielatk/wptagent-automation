@@ -57,14 +57,16 @@ fi
 echo "$(date +%s) | execute -> setup time" >> $logFile
 
 echo "$(date +%s) | execute WPT -> setup time" >> $logFile
-coin=$[ RANDOM % 2 ]
-args=""
-# setup webdriver and puppeteer tests
-if [[ $coin -eq 1 ]]; then
-    args="$(python3 $setupNavigationFilePath)"
-else
-    args="$(python3 $setupReproductionFilePath)"
-fi
+# coin=$[ RANDOM % 2 ]
+# args=""
+# # setup webdriver and puppeteer tests
+# if [[ $coin -eq 1 ]]; then
+#     args="$(python3 $setupNavigationFilePath)"
+# else
+#     args="$(python3 $setupReproductionFilePath)"
+# fi
+
+args="$(python3 $setupNavigationFilePath)"
 
 # traceroute to url
 url=$(echo $args | cut -d' ' -f1)
