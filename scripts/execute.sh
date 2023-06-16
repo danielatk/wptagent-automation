@@ -91,11 +91,13 @@ echo "webdriver ${args}" > $statusFile
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $statusFile $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile) >/dev/null 2>&1
 
 echo "$(date +%s) | execute WEBDRIVER -> navigation time ($args)" >> $logFile
-if [[ $coin -eq 1 ]]; then
-    python3 $webdriverNavigationFilePath $args 2>> $logFile
-else
-    python3 $webdriverReproductionFilePath $args 2>> $logFile
-fi
+# if [[ $coin -eq 1 ]]; then
+#     python3 $webdriverNavigationFilePath $args 2>> $logFile
+# else
+#     python3 $webdriverReproductionFilePath $args 2>> $logFile
+# fi
+
+python3 $webdriverNavigationFilePath $args 2>> $logFile
 
 echo "-------------------" >> $logFile
 
@@ -106,11 +108,13 @@ echo "puppeteer ${args}" > $statusFile
 scp -o StrictHostKeyChecking=no -P $collectionServerSshPort $statusFile $collectionServerUser@$collectionServerUrl:~/wptagent-control/status/$(cat $macFile) >/dev/null 2>&1
 
 echo "$(date +%s) | execute PUPPETEER -> navigation time ($args)" >> $logFile
-if [[ $coin -eq 1 ]]; then
-    node $puppeteerNavigationFilePath $args 2>> $logFile
-# else
-#     node $puppeteerReproductionFilePath $args 2>> $logFile
-fi
+# if [[ $coin -eq 1 ]]; then
+#     node $puppeteerNavigationFilePath $args 2>> $logFile
+# # else
+# #     node $puppeteerReproductionFilePath $args 2>> $logFile
+# fi
+
+node $puppeteerNavigationFilePath $args 2>> $logFile
 
 echo "-------------------" >> $logFile
 
