@@ -1,16 +1,20 @@
 version: "3.9"
 services:
   agent:
-    image: "carloscdias/data_gathering:${VERSION}"
+    image: carloscdias/data_gathering
+    container_name: data_gathering-container
     env_file:
       - data_gathering_agent.env
-    environment:
-      VERSION: "${VERSION}"
-    volumes:
-      - .env:/app/.env
-      - /var/run/docker.sock:/var/run/docker.sock:ro
   wptagent:
     image: webpagetest/agent
+    container_name: wpa_agent-container
     env_file:
       - wpa_agent.env
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: data_gathering-container
+  
 
