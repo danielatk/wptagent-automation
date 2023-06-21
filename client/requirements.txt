@@ -1,2 +1,4 @@
 celery[amqp]
 scipy
+pandas
+selenium

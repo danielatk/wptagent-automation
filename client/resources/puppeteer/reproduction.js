@@ -17,8 +17,8 @@ third argument is the viewport resolution (1 or 2)
 */
 
 (async () => {
-    const extensao_coleta = '/home/pi/wptagent-automation/extensions/ATF-chrome-plugin/'
-    const extensao_adblock = '/home/pi/wptagent-automation/extensions/adblock/'
+    const extensao_coleta = '/app/resources/extensions/ATF-chrome-plugin/'
+    const extensao_adblock = '/app/resources/extensions/adblock/'
 
     var extensoes = extensao_coleta;
     if(args[1] == 'True') {

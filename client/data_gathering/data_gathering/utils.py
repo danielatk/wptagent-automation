@@ -2,6 +2,8 @@ import random
 import subprocess
 import json
 
+from .navigation import navigation, reproduction
+
 VERSION_FILE = '/app/version'
 VERSION = None
 
@@ -50,10 +52,10 @@ def get_url_for_experiment_type(experiment_type):
     ])[experiment_type]
 
 def navigation_experiment(url):
-    return ''
+    return navigation(url, True, '1')
 
 def reproduction_experiment(url):
-    return ''
+    return reproduction(url, True, '1')
 
 def run_browser_experiment(experiment_type):
     return dict.fromkeys(EXPERIMENT_TYPES, [

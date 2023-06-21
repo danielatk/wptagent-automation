@@ -1,0 +1,3 @@
+[submodule "client/resources/extensions/ATF-chrome-plugin"]
+	path = client/resources/extensions/ATF-chrome-plugin
+	url = https://github.com/danielatk/ATF-chrome-plugin
