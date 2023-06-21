@@ -1,8 +1,11 @@
+import random
 import subprocess
 import json
 
 VERSION_FILE = '/app/version'
 VERSION = None
+
+EXPERIMENT_TYPES = ['navigation', 'reproduction']
 
 def call_program(program):
     result = subprocess.run(program, capture_output=True)
@@ -30,3 +33,30 @@ def get_runtime_version():
     with open(VERSION_FILE, 'r', encoding='utf-8') as f:
         VERSION = f.read()
     return VERSION
+
+def get_experiment_type_at_random():
+    return random.choices(EXPERIMENT_TYPES)[0]
+
+def get_navigation_url():
+    return ''
+
+def get_reproduction_url():
+    return ''
+
+def get_url_for_experiment_type(experiment_type):
+    return dict.fromkeys(EXPERIMENT_TYPES, [
+        get_navigation_url,
+        get_reproduction_url,
+    ])[experiment_type]
+
+def navigation_experiment(url):
+    return ''
+
+def reproduction_experiment(url):
+    return ''
+
+def run_browser_experiment(experiment_type):
+    return dict.fromkeys(EXPERIMENT_TYPES, [
+        navigation_experiment,
+        reproduction_experiment,
+    ])[experiment_type]
