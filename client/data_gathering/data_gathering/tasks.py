@@ -1,24 +1,23 @@
-from .utils import call_ndt7, call_traceroute, update_system
 from data_gathering.celery import app, logger, QUEUE
-import os
+from .utils import call_ndt7, call_traceroute, get_runtime_version
 
-@app.task(name=f'data_gathering.traceroute')
+@app.task(name='data_gathering.traceroute')
 @app.task(name=f'{QUEUE}.data_gathering.traceroute')
 def traceroute(domain):
     output = call_traceroute(domain)
     logger.info(output)
 
-@app.task(name=f'data_gathering.ndt7')
+@app.task(name='data_gathering.ndt7')
 @app.task(name=f'{QUEUE}.data_gathering.ndt7')
-def traceroute():
+def ndt7():
     output = call_ndt7()
     logger.info(output)
 
+
 @app.task(name=f'{QUEUE}.data_gathering.get_version')
 def get_version():
-    return os.environ.get('VERSION', 'NOT SET')
+    return get_runtime_version()
 
-@app.task(name=f'data_gathering.set_version')
-@app.task(name=f'{QUEUE}.data_gathering.set_version')
-def set_version(new_version):
-    update_system(new_version)
+@app.task(name='data_gathering.get_queue')
+def get_queue():
+    return QUEUE

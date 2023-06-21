@@ -11,5 +11,5 @@ services:
       - "5672:5672"
     volumes:
       - rabbitmq:/var/lib/rabbitmq
-  volumes:
-    rabbitmq:
+volumes:
+  rabbitmq:

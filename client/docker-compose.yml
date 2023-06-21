@@ -1,7 +1,8 @@
 version: "3.9"
 services:
   agent:
-    image: carloscdias/data_gathering
+    build: .
+    # image: carloscdias/data_gathering
     container_name: data_gathering-container
     env_file:
       - data_gathering_agent.env

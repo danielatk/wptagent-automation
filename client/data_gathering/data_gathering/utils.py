@@ -1,7 +1,8 @@
 import subprocess
 import json
 
-VERSION_FILE = '/app/.env'
+VERSION_FILE = '/app/version'
+VERSION = None
 
 def call_program(program):
     result = subprocess.run(program, capture_output=True)
@@ -22,8 +23,10 @@ def call_traceroute(server, ip_v6 = False):
     result, _ = call_program(command)
     return result
 
-def update_system(new_version):
-    with open(VERSION_FILE, 'w') as f:
-        f.write(f'VERSION={new_version}')
-    call_program(['docker', 'compose', '-f', 'docker-compose-client.yml', 'up', '-d'])
-
+def get_runtime_version():
+    global VERSION
+    if VERSION:
+        return VERSION
+    with open(VERSION_FILE, 'r', encoding='utf-8') as f:
+        VERSION = f.read()
+    return VERSION
