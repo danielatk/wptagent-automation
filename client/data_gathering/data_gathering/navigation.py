@@ -17,14 +17,14 @@ def setup_chrome(use_adblock, resolution_type):
         # add adblock extension
         chrome_options.add_extension(EXTENSAO_ADBLOCK_CRX)
     chrome_options.add_argument(f'--load-extension={extensoes}')
-    chrome_options.add_argument('--user-data-dir="/data/chrome"')
-    chrome_options.add_argument('--profile-directory="data_gathering_agent"')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument('--no-sandbox')
+    # chrome_options.add_argument('--user-data-dir="/data/chrome"')
+    # chrome_options.add_argument('--profile-directory="data_gathering_agent"')
+    # chrome_options.add_argument('--disable-dev-shm-usage')
+    # chrome_options.add_argument('--no-sandbox')
     # browser log
     # chrome_options.set_capability('goog:loggingPrefs', { 'browser':'ALL' })
     driver = webdriver.Chrome(options = chrome_options)
-    driver.execute_cdp_cmd("Network.setCacheDisabled", {"cacheDisabled":True})
+    # driver.execute_cdp_cmd("Network.setCacheDisabled", {"cacheDisabled":True})
     # resolução da tela (https://gs.statcounter.com/screen-resolution-stats/desktop/worldwide)
     resolution = {
         '1': [1920, 1080],
