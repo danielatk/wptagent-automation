@@ -15,6 +15,8 @@ PAGES_FILE_PATH = '/app/resources/top_100_brasil.csv'
 
 Base = declarative_base()
 
+engine = None
+
 class Video(Base):
     __tablename__ = "video"
 
@@ -34,22 +36,22 @@ class Page(Base):
     time_on_site: Mapped[str] = mapped_column(String(5))
     seen: Mapped[bool]
 
-def get_random_instance(engine, clazz):
-    with Session(engine) as session:
-        not_seen = session.query(clazz).where(not clazz.seen).count()
+def get_random_instance(clazz):
+    engine = get_database_engine()
+    with Session(engine, expire_on_commit=False) as session, session.begin():
+        not_seen = session.query(clazz).filter_by(seen=False).count()
         if not_seen <= 0:
-            with session.begin():
-                session.scalars(update(clazz).values(seen=False))
-        instance = session.query(clazz).where(not clazz.seen).order_by(func.random()).limit(1).one()
+            session.execute(update(clazz).values(seen=False))
+        instance = session.query(clazz).filter_by(seen=False).order_by(func.random()).limit(1).one()
         instance.seen = True
         return instance
 
-def get_random_page(engine):
-    page = get_random_instance(engine, Page)
+def get_random_page():
+    page = get_random_instance(Page)
     return page.domain
 
-def get_random_video(engine):
-    video = get_random_instance(engine, Video)
+def get_random_video():
+    video = get_random_instance(Video)
     return video.get_url()
 
 def get_all_videos_from_file():
@@ -63,14 +65,17 @@ def get_all_pages_from_file():
                 monthly_traffic=p['Tráfego mensal'],
                 pages_per_visit=p['páginas por visitas'],
                 time_on_site=p['tempo no site (min)'],
-                seen=False) for p in pages.iterrows()]
+                seen=False) for _, p in pages.iterrows()]
 
 def get_database_engine():
+    global engine
+    if engine:
+        return engine
     engine = create_engine(DATABASE_URL, echo=True)
     if not database_exists(engine.url):
         create_database(engine.url)
         Base.metadata.create_all(engine)
-        with Session(engine) as session:
+        with Session(engine) as session, session.begin():
             session.add_all(get_all_videos_from_file())
             session.add_all(get_all_pages_from_file())
     return engine

@@ -3,9 +3,6 @@ from celery.utils.log import get_task_logger
 from celery.schedules import crontab
 import os
 from kombu import Exchange, Queue, binding
-from data_gathering.model import get_database_engine
-
-engine = get_database_engine()
 
 BACKEND = os.environ.get('BACKEND', 'rpc://guest:guest@localhost/')
 BROKER  = os.environ.get('BROKER', 'amqp://guest:guest@localhost/')

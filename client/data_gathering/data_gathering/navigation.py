@@ -4,7 +4,6 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
 
 EXTENSAO_COLETA = '/app/resources/extensions/ATF-chrome-plugin/'
@@ -20,10 +19,11 @@ def setup_chrome(use_adblock, resolution_type):
     chrome_options.add_argument(f'--load-extension={extensoes}')
     chrome_options.add_argument('--user-data-dir="/data/chrome"')
     chrome_options.add_argument('--profile-directory="data_gathering_agent"')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--no-sandbox')
     # browser log
-    d = DesiredCapabilities.CHROME
-    d['goog:loggingPrefs'] = { 'browser':'ALL' }
-    driver = webdriver.Chrome(desired_capabilities=d, options = chrome_options)
+    # chrome_options.set_capability('goog:loggingPrefs', { 'browser':'ALL' })
+    driver = webdriver.Chrome(options = chrome_options)
     driver.execute_cdp_cmd("Network.setCacheDisabled", {"cacheDisabled":True})
     # resolução da tela (https://gs.statcounter.com/screen-resolution-stats/desktop/worldwide)
     resolution = {
