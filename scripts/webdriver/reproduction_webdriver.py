@@ -58,8 +58,6 @@ def main():
 
     driver.get(args[1])
 
-    beginning = datetime.timestamp(datetime.now())
-
     # with open(arquivo_log, 'a') as file :
     #     file.write("reproduction WEBDRIVER -> test begun successfully")
     #     file.write("reproduction WEBDRIVER -> browser log:")
@@ -67,40 +65,76 @@ def main():
     #         file.write(str(entry))
     #         file.write('\n\n')
 
-    while True:
+    seconds_timeout = 10
+    found_player = False
+
+    for _ in range(seconds_timeout):
         try:
             video = driver.find_element('id', 'ytd-player')
+            found_player = True
             break
         except NoSuchElementException:
+            time.sleep(1)
             pass
 
-    encontrou_botao = True
-    try:
-        play_btn = driver.find_element('xpath', "//div[@aria-label='Reproduzir (k)']/div[@class='ytp-play-button ytp-button'][text()='Reproduzir (k)']")
-    except NoSuchElementException:
-        encontrou_botao = not encontrou_botao
-        pass
-    if encontrou_botao:
-        play_btn.click()
+    if not found_player or not video:
+        driver.quit()
+        return
+
+
+    found_play_btn = False
+
+    for _ in range(seconds_timeout):
+        try:
+            play_btn = driver.find_element('class name', 'ytp-play-button')
+            found_play_btn = True
+            break
+        except NoSuchElementException:
+            time.sleep(1)
+            pass
+
+    if not found_play_btn or not play_btn:
+        driver.quit()
+        return
+
+    play_btn.click()
 
     begin_time = time.time()
 
     # autoplay_btn = driver.find_element('id', 'toggleButton')
     # autoplay_btn.click()
 
-    while True:
-        fullscreen = driver.find_elements('class name', 'ytp-fullscreen-button')
-        fullscreen_btn = fullscreen[len(fullscreen)-1]
-        while True:
-            try:
-                fullscreen_btn.click()
-                break
-            except WebDriverException:
-                pass
-        #if fullscreen_btn.is_displayed() and fullscreen_btn.is_enabled():
-            #fullscreen_btn.click()
-            #break
-        break
+    found_fullscreen = False
+
+    for _ in range(seconds_timeout):
+        try:
+            fullscreen = driver.find_elements('class name', 'ytp-fullscreen-button')
+            found_fullscreen = True
+            break
+        except NoSuchElementException:
+            time.sleep(1)
+            pass
+
+    # while True:
+    #     fullscreen = driver.find_elements('class name', 'ytp-fullscreen-button')
+    #     fullscreen_btn = fullscreen[len(fullscreen)-1]
+    #     while True:
+    #         try:
+    #             fullscreen_btn.click()
+    #             break
+    #         except WebDriverException:
+    #             pass
+    #     #if fullscreen_btn.is_displayed() and fullscreen_btn.is_enabled():
+    #         #fullscreen_btn.click()
+    #         #break
+    #     break
+
+    if not found_fullscreen or len(fullscreen) == 0:
+        driver.quit()
+        return
+
+    fullscreen_btn = fullscreen[len(fullscreen)-1]
+    fullscreen_btn.click()
 
     actionChains = ActionChains(driver)
     actionChains.context_click(video).perform()
@@ -118,12 +152,26 @@ def main():
 
     # TODO(danielatk): write JSON with dict!
     json_stats_for_nerds = '{"st":'
-    json_stats_for_nerds += str(beginning)
+    json_stats_for_nerds += str(begin_time)
     # indicates file has SFN data
     json_stats_for_nerds += ',"SFN":1'
     json_stats_for_nerds += ',"vals":['
 
+    settings = driver.find_elements('class name', 'ytp-settings-button')
+    settings_btn = settings[len(settings)-1]
+
     while True:
+        encontrou_progress_bar = True
+        try:
+            # actionChains.move_to_element(fullscreen_btn).perform()
+            # this forces the progress bar to update
+            settings_btn.click()
+            progress_bar = driver.find_elements('class name', 'ytp-progress-bar')
+            progress_bar = progress_bar[0]
+            progress = progress_bar.get_attribute('aria-valuenow')
+        except NoSuchElementException:
+            encontrou_progress_bar = not encontrou_progress_bar
+        pass
         encontrou_video_res = True
         try:
             video_res = stats_panel.find_element('xpath', ".//span[contains(text(), '@')]")
@@ -206,6 +254,13 @@ def main():
         else:
             json_stats_for_nerds += 'NaN'
         json_stats_for_nerds += '"'
+        json_stats_for_nerds += ',"BAR":'
+        json_stats_for_nerds += '"'
+        if encontrou_progress_bar == True:
+            json_stats_for_nerds += progress
+        else:
+            json_stats_for_nerds += 'NaN'
+        json_stats_for_nerds += '"'
         timestamp = datetime.timestamp(datetime.now())
         json_stats_for_nerds += ',"ts":'
         json_stats_for_nerds += str(timestamp)
@@ -214,13 +269,11 @@ def main():
         time.sleep(0.5)
 
         #attrs = driver.execute_script('var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return items;', progress_bar)
-        #print(attrs)
-        '''progress_bar = driver.find_elements('class name', 'ytp-progress-bar')
-        progress_bar = progress_bar[0]
-        progress = progress_bar.get_attribute('aria-valuenow')
-        print(progress)
-        if int(progress) >= 60:
-            break'''
+        # progress_bar = driver.find_elements('class name', 'ytp-progress-bar')
+        # progress_bar = progress_bar[0]
+        # progress = progress_bar.get_attribute('aria-valuenow')
+        # if int(progress) >= 60:
+        #     break
 
         if time.time() - begin_time >= 70:
             break
@@ -241,7 +294,7 @@ def main():
     index = args[1].find('watch?v=')
     video_id = args[1][index+8:]
 
-    filename = '/home/pi/wptagent-automation/sfn_data/{}_{}_{}_webdriver_sfn.json'.format(video_id, mac, beginning)
+    filename = '/home/pi/wptagent-automation/sfn_data/{}_{}_{}_webdriver_sfn.json'.format(video_id, mac, begin_time)
 
     with open(filename, 'w') as outfile:
         outfile.write(json_stats_for_nerds)
@@ -258,7 +311,7 @@ def main():
     with open(arquivo_porta_ssh_servidor, 'r') as f:
         porta_ssh_servidor = f.read().rstrip()
 
-    command = 'scp -o StrictHostKeyChecking=no -P {} /home/pi/wptagent-automation/sfn_data/{}_{}_{}_webdriver_sfn.json {}@{}:~/wptagent-control/other_data'.format(porta_ssh_servidor, video_id, mac, beginning, usuario_servidor, url_servidor)
+    command = 'scp -o StrictHostKeyChecking=no -P {} /home/pi/wptagent-automation/sfn_data/{}_{}_{}_webdriver_sfn.json {}@{}:~/wptagent-control/other_data'.format(porta_ssh_servidor, video_id, mac, begin_time, usuario_servidor, url_servidor)
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
     output1, error1 = process.communicate()
 
