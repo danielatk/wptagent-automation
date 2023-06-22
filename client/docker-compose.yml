@@ -5,6 +5,10 @@ services:
     build: .
     # image: carloscdias/data_gathering
     container_name: data_gathering-container
+    privileged: true
+    ipc: host
+    environment:
+      - DISPLAY=:2
     env_file:
       - data_gathering_agent.env
     volumes:

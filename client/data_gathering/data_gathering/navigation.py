@@ -3,28 +3,32 @@ import time
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver import ActionChains
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chromium.service import ChromiumService
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
-
+import selenium
 EXTENSAO_COLETA = '/app/resources/extensions/ATF-chrome-plugin/'
 EXTENSAO_ADBLOCK_CRX = '/app/resources/extensions/adblock.crx'
 
 def setup_chrome(use_adblock, resolution_type):
     # opções do chrome
-    chrome_options = Options()
+    chrome_options = webdriver.ChromeOptions()
     extensoes = EXTENSAO_COLETA
     if use_adblock:
         # add adblock extension
         chrome_options.add_extension(EXTENSAO_ADBLOCK_CRX)
     chrome_options.add_argument(f'--load-extension={extensoes}')
-    # chrome_options.add_argument('--user-data-dir="/data/chrome"')
-    # chrome_options.add_argument('--profile-directory="data_gathering_agent"')
-    # chrome_options.add_argument('--disable-dev-shm-usage')
-    # chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--user-data-dir=/data/chrome')
+    chrome_options.add_argument('--profile-directory=data_gathering_agent')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--verbose')
+    chrome_options.add_argument('--log-path=/data/ChromeDriver.log')
     # browser log
-    # chrome_options.set_capability('goog:loggingPrefs', { 'browser':'ALL' })
-    driver = webdriver.Chrome(options = chrome_options)
-    # driver.execute_cdp_cmd("Network.setCacheDisabled", {"cacheDisabled":True})
+    chrome_options.set_capability('goog:loggingPrefs', { 'browser':'ALL' })
+    # service = ChromiumService(executable_path='/usr/bin/chromedriver')
+    # driver = webdriver.Chrome(options=chrome_options, service=service)
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.execute_cdp_cmd("Network.setCacheDisabled", {"cacheDisabled":True})
     # resolução da tela (https://gs.statcounter.com/screen-resolution-stats/desktop/worldwide)
     resolution = {
         '1': [1920, 1080],
@@ -45,6 +49,7 @@ def selenium_navigation(url, use_adblock, resolution_type):
     for entry in driver.get_log('browser'):
         result += str(entry) + '\n\n'    
     time.sleep(18)
+    print(driver.get_log('browser'))
     driver.quit()
     return result
 
