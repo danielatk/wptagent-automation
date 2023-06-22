@@ -1,17 +1,6 @@
-Incluir comandos de navegação
+- Incluir comandos de navegação
 Incluir server-cli para disparo de mensagens
 Incluir fila para escrita
 Adicionar APScheduler
-Adicionar sqlite
-
-
-a cada vez que for executado ele vai samplear uma nova execução
-
-ordem de execução:
-- agenda a próxima execução do experimento de acordo com ~exp(30)
-- traceroute
-- tira na moeda entre setupNavigationFilePath e setupReproductionFilePath -> X
-- realiza o setup do teste X
-- realiza o teste X no puppeteer
-- realiza o teste X no selenium
-- realiza o teste ndt
+- Adicionar sqlite
+Modificar atfindex para permitir uso de variáveis

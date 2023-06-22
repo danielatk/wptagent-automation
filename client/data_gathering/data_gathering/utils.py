@@ -3,10 +3,10 @@ import subprocess
 import json
 
 from .navigation import navigation, reproduction
+from ..model import get_random_video, get_random_page
 
 VERSION_FILE = '/app/version'
 VERSION = None
-
 EXPERIMENT_TYPES = ['navigation', 'reproduction']
 
 def call_program(program):
@@ -18,7 +18,10 @@ def call_ndt7(server = None):
     if server:
         command += ['-server', server]
     result, _ = call_program(command)
-    result = str(result)
+    return parser_ndt_output(result)
+
+def parser_ndt_output(output):
+    result = str(output)
     blocks = result[2:-3].split('\\n')
     result = '[{}]'.format(','.join(blocks))
     return json.loads(result)
@@ -40,24 +43,24 @@ def get_experiment_type_at_random():
     return random.choices(EXPERIMENT_TYPES)[0]
 
 def get_navigation_url():
-    return ''
+    return get_random_page(engine)
 
 def get_reproduction_url():
-    return ''
+    return get_random_video(engine)
 
 def get_url_for_experiment_type(experiment_type):
     return dict.fromkeys(EXPERIMENT_TYPES, [
         get_navigation_url,
         get_reproduction_url,
-    ])[experiment_type]
+    ])[experiment_type]()
 
-def navigation_experiment(url):
-    return navigation(url, True, '1')
+def navigation_experiment(url, use_adblock, resolution_type):
+    return navigation(url, use_adblock, resolution_type)
 
-def reproduction_experiment(url):
-    return reproduction(url, True, '1')
+def reproduction_experiment(url, use_adblock, resolution_type):
+    return reproduction(url, use_adblock, resolution_type)
 
-def run_browser_experiment(experiment_type):
+def get_browser_experiment_func(experiment_type):
     return dict.fromkeys(EXPERIMENT_TYPES, [
         navigation_experiment,
         reproduction_experiment,
