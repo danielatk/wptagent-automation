@@ -21,6 +21,8 @@ def setup_chrome(use_adblock, resolution_type):
         # add adblock extension
         chrome_options.add_extension(EXTENSAO_ADBLOCK_CRX)
     chrome_options.add_argument(f'--load-extension={extensoes}')
+    chrome_options.add_argument('--user-data-dir="/data/chrome"')
+    chrome_options.add_argument('--profile-directory="data_gathering_agent"')
     # browser log
     d = DesiredCapabilities.CHROME
     d['goog:loggingPrefs'] = { 'browser':'ALL' }

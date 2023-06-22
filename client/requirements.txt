@@ -3,3 +3,4 @@ scipy
 pandas
 selenium
 SQLAlchemy
+sqlalchemy-utils

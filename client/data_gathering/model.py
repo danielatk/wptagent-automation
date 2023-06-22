@@ -1,11 +1,21 @@
-from sqlalchemy import String, update
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import String, update, create_engine
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.sql.expression import func
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy_utils import database_exists, create_database
+import pandas as pd
 
-class Video(DeclarativeBase):
+DATABASE_PATH = '/data/data_gathering.db'
+DATABASE_URL = f'sqlite:///{DATABASE_PATH}'
+
+VIDEOS_FILE_PATH = '/app/resources/videos'
+PAGES_FILE_PATH = '/app/resources/top_100_brasil.csv'
+
+Base = declarative_base()
+
+class Video(Base):
     __tablename__ = "video"
 
     id: Mapped[str] = mapped_column(String(20), primary_key=True)
@@ -14,7 +24,7 @@ class Video(DeclarativeBase):
     def get_url(self):
         return f'https://www.youtube.com/watch?v={self.id}'
 
-class Page(DeclarativeBase):
+class Page(Base):
     __tablename__ = "page"
 
     rank: Mapped[int] = mapped_column(primary_key=True)
@@ -26,8 +36,8 @@ class Page(DeclarativeBase):
 
 def get_random_instance(engine, clazz):
     with Session(engine) as session:
-        not_watched = session.query(clazz).where(not clazz.seen).count()
-        if not_watched <= 0:
+        not_seen = session.query(clazz).where(not clazz.seen).count()
+        if not_seen <= 0:
             with session.begin():
                 session.scalars(update(clazz).values(seen=False))
         instance = session.query(clazz).where(not clazz.seen).order_by(func.random()).limit(1).one()
@@ -41,3 +51,25 @@ def get_random_page(engine):
 def get_random_video(engine):
     video = get_random_instance(engine, Video)
     return video.get_url()
+
+def get_all_videos_from_file():
+    videos = pd.read_csv(VIDEOS_FILE_PATH, header=None)
+    return [Video(id=video_id, seen=False) for video_id in videos.iloc[0]]
+
+def get_all_pages_from_file():
+    pages = pd.read_csv(PAGES_FILE_PATH)
+    return [Page(rank=p['Posicionamento'],
+                domain=p['Domínio'],
+                monthly_traffic=p['Tráfego mensal'],
+                pages_per_visit=p['páginas por visitas'],
+                time_on_site=p['tempo no site (min)'],
+                seen=False) for p in pages.iterrows()]
+
+def get_database_engine():
+    engine = create_engine(DATABASE_URL, echo=True)
+    if not database_exists(engine.url):
+        create_database(engine.url)
+        Base.metadata.create_all(engine)
+        with Session(engine) as session:
+            session.add_all(get_all_videos_from_file())
+            session.add_all(get_all_pages_from_file())

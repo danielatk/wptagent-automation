@@ -6,6 +6,8 @@ services:
     container_name: data_gathering-container
     env_file:
       - data_gathering_agent.env
+    volumes:
+      - data_gathering_volume:/data
   wptagent:
     image: webpagetest/agent
     container_name: wpa_agent-container
@@ -17,5 +19,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: data_gathering-container
-  
+volumes:
+  data_gathering_volume:  
 
