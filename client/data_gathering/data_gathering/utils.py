@@ -2,8 +2,8 @@ import random
 import subprocess
 import json
 
-from .navigation import navigation, reproduction
-from ..model import get_random_video, get_random_page
+from .navigation import selenium_navigation, selenium_reproduction
+from ..model import get_random_video, get_random_page, get_database_engine
 
 VERSION_FILE = '/app/version'
 VERSION = None
@@ -43,9 +43,11 @@ def get_experiment_type_at_random():
     return random.choices(EXPERIMENT_TYPES)[0]
 
 def get_navigation_url():
+    engine = get_database_engine()
     return get_random_page(engine)
 
 def get_reproduction_url():
+    engine = get_database_engine()
     return get_random_video(engine)
 
 def get_url_for_experiment_type(experiment_type):
@@ -54,14 +56,19 @@ def get_url_for_experiment_type(experiment_type):
         get_reproduction_url,
     ])[experiment_type]()
 
-def navigation_experiment(url, use_adblock, resolution_type):
-    return navigation(url, use_adblock, resolution_type)
+def call_puppeteer(script, url, use_adblock, resolution_type):
+    command = ['node', f'/app/resources/puppeteer/{script}', url, str(use_adblock), str(resolution_type)]
+    result, _ = call_program(command)
+    return result
 
-def reproduction_experiment(url, use_adblock, resolution_type):
-    return reproduction(url, use_adblock, resolution_type)
+def puppeteer_navigation(url, use_adblock, resolution_type):
+    return call_puppeteer('navigation.js', url, use_adblock, resolution_type)
+
+def puppeteer_reproduction(url, use_adblock, resolution_type):
+    return call_puppeteer('reproduction.js', url, use_adblock, resolution_type)
 
 def get_browser_experiment_func(experiment_type):
     return dict.fromkeys(EXPERIMENT_TYPES, [
-        navigation_experiment,
-        reproduction_experiment,
+        [selenium_navigation, puppeteer_navigation],
+        [selenium_reproduction, puppeteer_reproduction],
     ])[experiment_type]

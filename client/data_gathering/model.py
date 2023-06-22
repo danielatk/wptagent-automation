@@ -73,3 +73,4 @@ def get_database_engine():
         with Session(engine) as session:
             session.add_all(get_all_videos_from_file())
             session.add_all(get_all_pages_from_file())
+    return engine

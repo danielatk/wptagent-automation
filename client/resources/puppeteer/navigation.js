@@ -37,6 +37,8 @@ third argument is the viewport resolution (1 or 2)
             `--start-maximized`,
             `--disable-extensions-except=${extensoes}`,
             `--load-extension=${extensoes}`,
+            '--user-data-dir="/data/chrome"',
+            '--profile-directory="data_gathering_agent"'
         ],
         ignoreDefaultArgs: ["--disable-extension", "--enable-automation"],
         executablePath: '/usr/bin/chromium-browser',

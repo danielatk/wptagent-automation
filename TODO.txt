@@ -1,6 +1,3 @@
-- Incluir comandos de navegação
 Incluir server-cli para disparo de mensagens
 Incluir fila para escrita
 Adicionar APScheduler
-- Adicionar sqlite
-Modificar atfindex para permitir uso de variáveis

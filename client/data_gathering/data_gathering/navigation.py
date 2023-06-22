@@ -1,8 +1,5 @@
 # NAVIGATION FILE
 import time
-import sys
-import subprocess
-import re
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver import ActionChains
@@ -41,7 +38,7 @@ def setup_chrome(use_adblock, resolution_type):
                 driver.switch_to.window(w)
     return driver
 
-def navigation(url, use_adblock, resolution_type):
+def selenium_navigation(url, use_adblock, resolution_type):
     driver = setup_chrome(use_adblock, resolution_type)
     driver.get(url)
     result = "navigation WEBDRIVER -> test begun successfully\nnavigation WEBDRIVER -> browser log:"
@@ -52,7 +49,7 @@ def navigation(url, use_adblock, resolution_type):
     return result
 
 
-def reproduction(url, use_adblock, resolution_type):
+def selenium_reproduction(url, use_adblock, resolution_type):
     driver = setup_chrome(use_adblock, resolution_type)
     driver.get(url)
 
