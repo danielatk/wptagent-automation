@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 from scipy.stats import expon
-from data_gathering.celery import app, logger, QUEUE
+from data_gathering.celery import app, logger, QUEUE, SERVER
 from .utils import *
 
 EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL = 30
@@ -40,7 +40,7 @@ def experimento_1():
         - realiza o teste ndt
     """
     mac = QUEUE[4:]
-    server = 'http://0.0.0.0:1234'
+    server = SERVER
     result = {
         'started': None,
         'mac': mac,

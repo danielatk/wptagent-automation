@@ -7,6 +7,7 @@ from kombu import Exchange, Queue, binding
 BACKEND = os.environ.get('BACKEND', 'rpc://guest:guest@localhost/')
 BROKER  = os.environ.get('BROKER', 'amqp://guest:guest@localhost/')
 QUEUE   = os.environ.get('QUEUE', 'default')
+SERVER  = os.environ.get('SERVER', 'http://0.0.0.0:1234')
 
 logger = get_task_logger(__name__)
 
