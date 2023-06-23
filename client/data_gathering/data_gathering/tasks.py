@@ -1,6 +1,9 @@
+import io
 from urllib.parse import urlparse
+from datetime import datetime, timedelta
 from scipy.stats import expon
-from data_gathering.celery import app, logger, QUEUE, SERVER
+from apscheduler.triggers.cron import CronTrigger
+from data_gathering.celery import app, scheduler, logger, QUEUE, SERVER, IPV6
 from .utils import *
 
 EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL = 30
@@ -26,6 +29,26 @@ def get_version():
 def get_queue():
     return QUEUE
 
+@app.task(name='data_gathering.local_schedule')
+@app.task(name=f'{QUEUE}.data_gathering.local_schedule')
+def local_schedule(func: str, schedule: str, kwargs: dict):
+    FUNC_NAME_TO_FUNC = {
+        'experimento_1': experimento_1,
+        'ndt7': ndt7,
+        'traceroute': traceroute,
+    }
+    if func not in FUNC_NAME_TO_FUNC:
+        raise ValueError()
+    job = scheduler.add_job(FUNC_NAME_TO_FUNC[func], CronTrigger.from_crontab(schedule), kwargs=kwargs)
+    return job.id
+
+@app.task(name=f'{QUEUE}.data_gathering.get_local_schedule')
+def get_local_schedule():
+    with io.StringIO() as f:
+        scheduler.print_jobs(out=f)
+        f.seek(0)
+        return f.read()
+
 @app.task(name='data_gathering.experimento_1')
 @app.task(name=f'{QUEUE}.data_gathering.experimento_1')
 def experimento_1(schedule_next: bool = False):
@@ -40,16 +63,17 @@ def experimento_1(schedule_next: bool = False):
         - realiza o teste ndt
     """
     mac = QUEUE[4:]
-    server = SERVER
-    ipv6 = False
+    now = datetime.now()
     result = {
-        'started': None,
+        'started': now,
         'mac': mac,
     }
     # agenda APS
     if schedule_next:
         time_in_minutes = expon.rvs(scale=int(EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL), size=1)[0]
-        logger.info(f'Next execution: {time_in_minutes}')
+        next_run = now + timedelta(minutes=time_in_minutes)
+        scheduler.add_job(experimento_1, 'date', run_date=next_run, args=[True])
+        logger.info(f'Next execution: {next_run}')
     # navigation or reproduction?
     experiment = get_experiment_type_at_random()
     result['experiment'] = experiment
@@ -69,7 +93,7 @@ def experimento_1(schedule_next: bool = False):
     result['browser'] = {}
     browser_experiments = get_browser_experiment_func(experiment)
     for method, run_func in zip(['selenium', 'puppeteer'], browser_experiments):
-        result['browser'][method] = run_func(url, use_adblock, resolution_type, mac, server)
+        result['browser'][method] = run_func(url, use_adblock, resolution_type, mac, SERVER)
     # ndt
-    result['ndt'] = ndt_experiment(ipv6)
+    result['ndt'] = ndt_experiment(IPV6)
     return result
