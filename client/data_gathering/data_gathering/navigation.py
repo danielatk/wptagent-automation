@@ -67,7 +67,7 @@ def wait_atf_extension(driver, max_wait_s):
         log = driver.get_log('browser')
         if len(log) > 0:
             logs += log
-            if logs[-1]['message'].decode('utf-8') == message:
+            if logs[-1]['message'] == message:
                 break
     return logs
 
