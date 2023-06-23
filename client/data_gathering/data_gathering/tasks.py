@@ -54,7 +54,7 @@ def experimento_1():
     # setup
     url = get_url_for_experiment_type(experiment)
     use_adblock = random.random() < 0.5
-    resolution_type = '1' if random.random() < 0.5 else '2'
+    resolution_type = 1 if random.random() < 0.5 else 2
     result['url'] = url
     result['use_adblock'] = use_adblock
     result['resolution_type'] = resolution_type
@@ -63,6 +63,7 @@ def experimento_1():
     traceroute_result = call_traceroute(domain)
     result['traceroute'] = traceroute_result
     # browser experiments
+    unlock_chrome_profile()
     result['browser'] = {}
     browser_experiments = get_browser_experiment_func(experiment)
     for method, run_func in zip(['selenium', 'puppeteer'], browser_experiments):

@@ -36,6 +36,9 @@ class Page(Base):
     time_on_site: Mapped[str] = mapped_column(String(5))
     seen: Mapped[bool]
 
+    def get_url(self):
+        return f'http://{self.domain}'
+
 def get_random_instance(clazz):
     engine = get_database_engine()
     with Session(engine, expire_on_commit=False) as session, session.begin():
@@ -48,7 +51,7 @@ def get_random_instance(clazz):
 
 def get_random_page():
     page = get_random_instance(Page)
-    return page.domain
+    return page.get_url()
 
 def get_random_video():
     video = get_random_instance(Video)

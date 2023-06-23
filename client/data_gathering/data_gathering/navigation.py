@@ -63,9 +63,10 @@ def selenium_navigation(url: str, use_adblock: bool, resolution_type: int):
     driver = setup_chrome(use_adblock, resolution_type)
     driver.get(url)
     result = "navigation WEBDRIVER -> test begun successfully\nnavigation WEBDRIVER -> browser log:"
-    time.sleep(10)
     for entry in driver.get_log('browser'):
         result += str(entry) + '\n\n'
+    time.sleep(20)
+    print(driver.get_log('browser'))
     driver.quit()
     return result
 
