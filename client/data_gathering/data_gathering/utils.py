@@ -54,16 +54,16 @@ def get_url_for_experiment_type(experiment_type):
         get_random_video,
     ]))[experiment_type]()
 
-def call_puppeteer(script, url, use_adblock, resolution_type):
-    command = ['node', f'/app/resources/puppeteer/{script}', url, str(use_adblock), str(resolution_type)]
+def call_puppeteer(url, use_adblock, resolution_type):
+    command = ['node', '/app/resources/puppeteer/index.js', url, str(use_adblock), str(resolution_type)]
     result, _ = call_program(command)
     return result
 
 def puppeteer_navigation(url, use_adblock, resolution_type):
-    return call_puppeteer('navigation.js', url, use_adblock, resolution_type)
+    return call_puppeteer(url, use_adblock, resolution_type)
 
 def puppeteer_reproduction(url, use_adblock, resolution_type):
-    return call_puppeteer('reproduction.js', url, use_adblock, resolution_type)
+    return call_puppeteer(url, use_adblock, resolution_type)
 
 def selenium_navigation_experiment(url, use_adblock, resolution_type, mac, server):
     set_extension_options(EXTENSION_DB, {

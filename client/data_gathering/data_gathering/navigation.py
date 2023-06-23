@@ -59,16 +59,24 @@ def setup_chrome(use_adblock: bool, resolution_type: int):
                 driver.switch_to.window(w)
     return driver
 
+def wait_atf_extension(driver, max_wait_s):
+    message = 'chrome-extension://ojaljkmpomphjjkkgkdhenlhogcajbmf/atfindex.js 343:16 "saved last session stats"'
+    logs = []
+    for _ in range(max_wait_s*2):
+        time.sleep(0.5)
+        log = driver.get_log('browser')
+        if len(log) > 0:
+            logs += log
+            if logs[-1]['message'].decode('utf-8') == message:
+                break
+    return logs
+
 def selenium_navigation(url: str, use_adblock: bool, resolution_type: int):
     driver = setup_chrome(use_adblock, resolution_type)
     driver.get(url)
-    result = "navigation WEBDRIVER -> test begun successfully\nnavigation WEBDRIVER -> browser log:"
-    for entry in driver.get_log('browser'):
-        result += str(entry) + '\n\n'
-    time.sleep(20)
-    print(driver.get_log('browser'))
+    logs = wait_atf_extension(driver, 100)
     driver.quit()
-    return result
+    return logs
 
 
 def selenium_reproduction(url, use_adblock, resolution_type):
