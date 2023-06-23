@@ -2,12 +2,14 @@ import random
 import subprocess
 import json
 
-from .navigation import selenium_navigation, selenium_reproduction
+from .navigation import selenium_navigation, selenium_reproduction, set_extension_options
 from ..model import get_random_video, get_random_page
 
 VERSION_FILE = '/app/version'
 VERSION = None
 EXPERIMENT_TYPES = ['navigation', 'reproduction']
+
+EXTENSION_DB = '/data/chrome/data_gathering_agent/Sync Extension Settings/ojaljkmpomphjjkkgkdhenlhogcajbmf/'
 
 def call_program(program):
     result = subprocess.run(program, capture_output=True)
@@ -29,6 +31,10 @@ def parser_ndt_output(output):
 def call_traceroute(server, ip_v6 = False):
     command = ['traceroute', '-6' if ip_v6 else '-4', server]
     result, _ = call_program(command)
+    return result
+
+def unlock_chrome_profile():
+    result, _ = call_program(['rm', '/data/chrome/SingletonLock'])
     return result
 
 def get_runtime_version():
@@ -59,8 +65,48 @@ def puppeteer_navigation(url, use_adblock, resolution_type):
 def puppeteer_reproduction(url, use_adblock, resolution_type):
     return call_puppeteer('reproduction.js', url, use_adblock, resolution_type)
 
+def selenium_navigation_experiment(url, use_adblock, resolution_type, mac, server):
+    set_extension_options(EXTENSION_DB, {
+        'puppeteer': False,
+        'adblock': use_adblock,
+        'resolution_type': resolution_type,
+        'mac': mac,
+        'server_address': server,
+    })
+    return selenium_navigation(url, use_adblock, resolution_type)
+
+def selenium_reproduction_experiment(url, use_adblock, resolution_type, mac, server):
+    set_extension_options(EXTENSION_DB, {
+        'puppeteer': False,
+        'adblock': use_adblock,
+        'resolution_type': resolution_type,
+        'mac': mac,
+        'server_address': server,
+    })
+    return selenium_reproduction(url, use_adblock, resolution_type)
+
+def puppeteer_navigation_experiment(url, use_adblock, resolution_type, mac, server):
+    set_extension_options(EXTENSION_DB, {
+        'puppeteer': True,
+        'adblock': use_adblock,
+        'resolution_type': resolution_type,
+        'mac': mac,
+        'server_address': server,
+    })
+    return puppeteer_navigation(url, use_adblock, resolution_type)
+
+def puppeteer_reproduction_experiment(url, use_adblock, resolution_type, mac, server):
+    set_extension_options(EXTENSION_DB, {
+        'puppeteer': True,
+        'adblock': use_adblock,
+        'resolution_type': resolution_type,
+        'mac': mac,
+        'server_address': server,
+    })
+    return puppeteer_reproduction(url, use_adblock, resolution_type)
+
 def get_browser_experiment_func(experiment_type):
     return dict(zip(EXPERIMENT_TYPES, [
-        [selenium_navigation, puppeteer_navigation],
-        [selenium_reproduction, puppeteer_reproduction],
+        [selenium_navigation_experiment, puppeteer_navigation_experiment],
+        [selenium_reproduction_experiment, puppeteer_reproduction_experiment],
     ]))[experiment_type]

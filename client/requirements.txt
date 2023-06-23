@@ -4,3 +4,4 @@ pandas
 selenium
 SQLAlchemy
 sqlalchemy-utils
+plyvel

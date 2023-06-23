@@ -1,15 +1,32 @@
-# NAVIGATION FILE
 import time
+import json
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.chromium.service import ChromiumService
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
-import selenium
+import plyvel as levelDB
+
 EXTENSAO_COLETA = '/app/resources/extensions/ATF-chrome-plugin/'
 EXTENSAO_ADBLOCK_CRX = '/app/resources/extensions/adblock.crx'
 
-def setup_chrome(use_adblock, resolution_type):
+def set_extension_options(database, options: dict):
+    """
+        main keys:
+        - puppeteer: bool
+        - adblock: bool
+        - resolution_type: int
+        - server_address: string
+        - mac: string
+        - verbosity: string
+        - save_file: int
+    """
+    db = levelDB.DB(database, create_if_missing=True)
+    for key, value in options.items():
+        db.put(key.encode(), json.dumps(value).encode())
+    db.close()
+    
+def setup_chrome(use_adblock: bool, resolution_type: int):
     # opções do chrome
     chrome_options = webdriver.ChromeOptions()
     extensoes = EXTENSAO_COLETA
@@ -24,15 +41,15 @@ def setup_chrome(use_adblock, resolution_type):
     chrome_options.add_argument('--verbose')
     chrome_options.add_argument('--log-path=/data/ChromeDriver.log')
     # browser log
-    chrome_options.set_capability('goog:loggingPrefs', { 'browser':'ALL' })
-    # service = ChromiumService(executable_path='/usr/bin/chromedriver')
-    # driver = webdriver.Chrome(options=chrome_options, service=service)
-    driver = webdriver.Chrome(options=chrome_options)
-    driver.execute_cdp_cmd("Network.setCacheDisabled", {"cacheDisabled":True})
+    chrome_options.set_capability('goog:loggingPrefs', { 'browser': 'ALL' })
+    service = ChromiumService(executable_path='/usr/bin/chromedriver')
+    driver = webdriver.Chrome(options=chrome_options, service=service)
+    # driver = webdriver.Chrome(options=chrome_options)
+    driver.execute_cdp_cmd('Network.setCacheDisabled', { 'cacheDisabled': True })
     # resolução da tela (https://gs.statcounter.com/screen-resolution-stats/desktop/worldwide)
     resolution = {
-        '1': [1920, 1080],
-        '2': [1366, 768],
+        1: [1920, 1080],
+        2: [1366, 768],
     }
     driver.set_window_size(resolution[resolution_type][0], resolution[resolution_type][1], driver.window_handles[0])
     if use_adblock: # adblock use
@@ -42,14 +59,13 @@ def setup_chrome(use_adblock, resolution_type):
                 driver.switch_to.window(w)
     return driver
 
-def selenium_navigation(url, use_adblock, resolution_type):
+def selenium_navigation(url: str, use_adblock: bool, resolution_type: int):
     driver = setup_chrome(use_adblock, resolution_type)
     driver.get(url)
     result = "navigation WEBDRIVER -> test begun successfully\nnavigation WEBDRIVER -> browser log:"
+    time.sleep(10)
     for entry in driver.get_log('browser'):
-        result += str(entry) + '\n\n'    
-    time.sleep(18)
-    print(driver.get_log('browser'))
+        result += str(entry) + '\n\n'
     driver.quit()
     return result
 

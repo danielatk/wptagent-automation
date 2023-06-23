@@ -39,9 +39,11 @@ def experimento_1():
         - realiza o teste X no puppeteer
         - realiza o teste ndt
     """
+    mac = QUEUE[4:]
+    server = 'http://0.0.0.0:1234'
     result = {
         'started': None,
-        'mac': QUEUE[4:],
+        'mac': mac,
     }
     # agenda APS
     time_in_minutes = expon.rvs(scale=int(EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL), size=1)[0]
@@ -64,7 +66,7 @@ def experimento_1():
     result['browser'] = {}
     browser_experiments = get_browser_experiment_func(experiment)
     for method, run_func in zip(['selenium', 'puppeteer'], browser_experiments):
-        result['browser'][method] = run_func(url, use_adblock, resolution_type)
+        result['browser'][method] = run_func(url, use_adblock, resolution_type, mac, server)
     # ndt
     ndt_result = call_ndt7()
     result['ndt_result'] = ndt_result
