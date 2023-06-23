@@ -3,7 +3,7 @@ import subprocess
 import json
 
 from .navigation import selenium_navigation, selenium_reproduction, set_extension_options
-from ..model import get_random_video, get_random_page
+from ..model import get_random_video, get_random_page, get_random_uf
 
 VERSION_FILE = '/app/version'
 VERSION = None
@@ -20,13 +20,37 @@ def call_ndt7(server = None):
     if server:
         command += ['-server', server]
     result, _ = call_program(command)
-    return parser_ndt_output(result)
+    return result
 
 def parser_ndt_output(output):
-    result = str(output)
-    blocks = result[2:-3].split('\\n')
-    result = '[{}]'.format(','.join(blocks))
-    return json.loads(result)
+    return [json.loads(x) for x in output.decode('utf-8').split('\n')]
+
+def ndt_experiment(has_ipv6: bool):
+    uf = get_random_uf()
+    result = {
+        'uf': uf,
+    }
+    if uf == 'mlab':
+        result = call_ndt7().decode('utf-8')
+        result['ndt'] = parser_ndt_output(result)
+        # get server fqdn
+        server = get_server_fqdn_from_ndt(result['ndt'])
+        result['traceroute-4'] = call_traceroute(server)
+        if has_ipv6:
+            result['traceroute-6'] = call_traceroute(server, True)
+    else:
+        server = f'{uf}.medidor.rnp.br'
+        result['ndt'] = call_ndt7(f'{server}:4443').decode('utf-8')
+        result['traceroute-4'] = call_traceroute(server)
+    return result
+
+def get_server_fqdn_from_ndt(ndt):
+    for line in ndt:
+        if 'Key' not in line:
+            continue
+        if line['Key'] == 'connected' and line['Value']['Test'] == 'download':
+            return line['Value']['Server']
+    return None
 
 def call_traceroute(server, ip_v6 = False):
     command = ['traceroute', '-6' if ip_v6 else '-4', server]

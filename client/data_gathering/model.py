@@ -12,6 +12,7 @@ DATABASE_URL = f'sqlite:///{DATABASE_PATH}'
 
 VIDEOS_FILE_PATH = '/app/resources/videos'
 PAGES_FILE_PATH = '/app/resources/top_100_brasil.csv'
+UF_FILE_PATH = '/app/resources/lista_ufs'
 
 Base = declarative_base()
 
@@ -56,6 +57,10 @@ def get_random_page():
 def get_random_video():
     video = get_random_instance(Video)
     return video.get_url()
+
+def get_random_uf():
+    ufs = pd.read_csv(UF_FILE_PATH, header=None)
+    return ufs.sample().iloc[0, 0]
 
 def get_all_videos_from_file():
     videos = pd.read_csv(VIDEOS_FILE_PATH, header=None)
