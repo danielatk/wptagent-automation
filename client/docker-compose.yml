@@ -5,19 +5,20 @@ services:
     build: .
     # image: carloscdias/data_gathering
     container_name: data_gathering-container
-    privileged: true
-    ipc: host
+    cap_add:
+      - NET_ADMIN
     environment:
       - DISPLAY=:2
     env_file:
       - data_gathering_agent.env
     volumes:
       - data_gathering_volume:/data
-  wptagent:
-    image: webpagetest/agent
-    container_name: wpa_agent-container
-    env_file:
-      - wpa_agent.env
+  # wptagent:
+  #   image: carloscdias/wptagent
+  #   container_name: wpa_agent-container
+  #   env_file:
+  #     - wpa_agent.env
+  #   command: python3 wptagent.py -vvvv --xvfb --dockerized --server http://127.0.0.1:80/work/ --location Test --key 123456789
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower

@@ -1,3 +1,1 @@
 Incluir server-cli para disparo de mensagens
-Incluir fila para escrita
-acertar imagem do wpt
