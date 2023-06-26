@@ -11,5 +11,10 @@ services:
       - "5672:5672"
     volumes:
       - rabbitmq:/var/lib/rabbitmq
+  monitor:
+    image: mher/flower
+    ports:
+      - "5555:5555"
+    command: celery --broker=amqp://guest:guest@broker:5672// flower
 volumes:
   rabbitmq:
