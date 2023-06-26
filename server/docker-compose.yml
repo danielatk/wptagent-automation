@@ -4,8 +4,8 @@ services:
     image: rabbitmq:3.12-management
     hostname: rabbit-server
     environment:
-      RABBITMQ_DEFAULT_USER: $RABBITMQ_DEFAULT_USER
-      RABBITMQ_DEFAULT_PASS: $RABBITMQ_DEFAULT_PASS
+      - RABBITMQ_DEFAULT_USER="$RABBITMQ_DEFAULT_USER"
+      - RABBITMQ_DEFAULT_PASS="$RABBITMQ_DEFAULT_PASS"
     ports:
       - "5672:5672"
     volumes:
@@ -13,7 +13,7 @@ services:
   server:
     build: .
     environment:
-      - QUEUE: "$QUEUE"
+      - QUEUE="$QUEUE"
     depends_on:
       - broker
   flower:
