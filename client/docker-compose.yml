@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   agent:
-    user: "${UID}"
+    user: "$UID"
     build: .
     # image: carloscdias/data_gathering
     container_name: data_gathering-container
@@ -9,22 +9,30 @@ services:
       - NET_ADMIN
     environment:
       - DISPLAY=:2
-    env_file:
-      - data_gathering_agent.env
+      - QUEUE="$QUEUE"
+      - BACKEND="$BACKEND"
+      - BROKER="$BROKER"
     volumes:
       - data_gathering_volume:/data
-  # wptagent:
-  #   image: carloscdias/wptagent
-  #   container_name: wpa_agent-container
-  #   env_file:
-  #     - wpa_agent.env
-  #   command: python3 wptagent.py -vvvv --xvfb --dockerized --server http://127.0.0.1:80/work/ --location Test --key 123456789
+  wptagent:
+    image: carloscdias/wptagent
+    container_name: wpa_agent-container
+    env_file:
+      - wpa_agent.env
+    environment:
+      - SERVER_URL="$SERVER_URL"
+      - LOCATION="$LOCATION"
+      - KEY="$KEY"
+      - NAME="$NAME"
+      - SHAPER="$SHAPER"
+      - EXTRA_ARGS="$EXTRA_ARGS"
+    command: python3 wptagent.py -vvvv --xvfb --dockerized --server $SERVER_URL --location $LOCATION --key $KEY
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: data_gathering-container
+    command: data_gathering-container wpa_agent-container
 volumes:
   data_gathering_volume:  
 

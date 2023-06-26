@@ -1,1 +1,0 @@
-Incluir server-cli para disparo de mensagens

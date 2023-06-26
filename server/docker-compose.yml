@@ -4,8 +4,8 @@ services:
     image: rabbitmq:3.12-management
     hostname: rabbit-server
     environment:
-      RABBITMQ_DEFAULT_USER: "guest"
-      RABBITMQ_DEFAULT_PASS: "guest"
+      RABBITMQ_DEFAULT_USER: $RABBITMQ_DEFAULT_USER
+      RABBITMQ_DEFAULT_PASS: $RABBITMQ_DEFAULT_PASS
     ports:
       - "5672:5672"
     volumes:
@@ -14,7 +14,7 @@ services:
     image: mher/flower
     ports:
       - "5555:5555"
-    command: celery --broker=amqp://guest:guest@broker:5672// flower
+    command: celery --broker=amqp://$RABBITMQ_DEFAULT_USER:RABBITMQ_DEFAULT_PASS@broker:5672// flower
     depends_on:
       - broker
   prometheus:
