@@ -23,7 +23,7 @@ services:
     image: mher/flower
     ports:
       - "5555:5555"
-    command: celery --broker="amqp://$RABBITMQ_DEFAULT_USER:RABBITMQ_DEFAULT_PASS@broker:5672//" flower
+    command: celery --broker="amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@broker:5672//" flower
     depends_on:
       - broker
   prometheus:
