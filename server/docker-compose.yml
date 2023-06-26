@@ -7,14 +7,30 @@ services:
       RABBITMQ_DEFAULT_USER: "guest"
       RABBITMQ_DEFAULT_PASS: "guest"
     ports:
-      - "8080:15672"
       - "5672:5672"
     volumes:
       - rabbitmq:/var/lib/rabbitmq
-  monitor:
+  flower:
     image: mher/flower
     ports:
       - "5555:5555"
     command: celery --broker=amqp://guest:guest@broker:5672// flower
+    depends_on:
+      - broker
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - flower
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+     - grafana-storage:/var/lib/grafana
+    depends_on:
+      - prometheus
 volumes:
   rabbitmq:
+  grafana-storage:
