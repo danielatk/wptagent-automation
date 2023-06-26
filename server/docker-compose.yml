@@ -8,19 +8,22 @@ services:
       - RABBITMQ_DEFAULT_PASS="$RABBITMQ_DEFAULT_PASS"
     ports:
       - "5672:5672"
+      - "8080:15672"
     volumes:
       - rabbitmq:/var/lib/rabbitmq
   server:
     build: .
     environment:
       - QUEUE="$QUEUE"
+      - BACKEND="$BACKEND"
+      - BROKER="$BROKER"
     depends_on:
       - broker
   flower:
     image: mher/flower
     ports:
       - "5555:5555"
-    command: celery --broker=amqp://$RABBITMQ_DEFAULT_USER:RABBITMQ_DEFAULT_PASS@broker:5672// flower
+    command: celery --broker="amqp://$RABBITMQ_DEFAULT_USER:RABBITMQ_DEFAULT_PASS@broker:5672//" flower
     depends_on:
       - broker
   prometheus:
