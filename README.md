@@ -10,10 +10,6 @@ The following tests are currently supported:
 * webpage visits via puppeteer, with ATF estimation plugin
 * NDT tests (with optional traceroute)
 
-For the webpage visits and video reproductions two factors are varied:
-* viewport resolution (1920x1080 or  1366x768)
-* adblock use
-
 For webpage visits a list of top 100 webpages visited in Brazil is used. For videos a list of 147 videos with 4K option is given. These can be easily customized.
 
 The NDT and traceroute results are sent via SSH and the ATF estimation plugin results are sent via XML to a node server.

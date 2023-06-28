@@ -54,7 +54,7 @@ echo "Setting up puppeteer"
 
 # configure puppeteer
 cd /home/pi/wptagent-automation/scripts/puppeteer/puppeteer_navigation
-sudo npm install puppeteer@17.0.0 puppeteer-core@1.20.0 puppeteer-extra@3.3.4 puppeteer-extra-plugin-adblocker@2.13.5 chromium@3.0.3
+sudo npm install puppeteer@17.0.0 puppeteer-core@1.20.0 puppeteer-extra@3.3.4 chromium@3.0.3
 
 collectionServerUrl=$(cat /home/pi/wptagent-automation/collection_server_url)
 collectionServerUser=$(cat /home/pi/wptagent-automation/collection_server_user)
