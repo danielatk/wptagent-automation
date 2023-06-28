@@ -10,8 +10,8 @@ arquivo_controle_mudanca = '/home/pi/wptagent-automation/mac_change'
 arquivo_mac = '/home/pi/wptagent-automation/mac'
 arquivo_porta_node = '/home/pi/wptagent-automation/collection_server_node_port'
 arquivo_url_servidor = '/home/pi/wptagent-automation/collection_server_url'
-alexa_top_100_brasil = '/home/pi/wptagent-automation/top_100_brasil.csv'
-alexa_top_100 = '/home/pi/wptagent-automation/top-100'
+navigation_list = '/home/pi/wptagent-automation/navigation_list.csv'
+navigation_sample_list = '/home/pi/wptagent-automation/navigation_sample_list'
 
 
 def modifica_extensao() :
@@ -36,38 +36,8 @@ def modifica_extensao() :
                 file.write(filedata)
 
 
-def toggle_adblock(adblock_usado) :
-    f = os.path.join(extensao_coleta,'atfindex.js')
-    if os.path.isfile(f):
-        with open(f, 'rb') as file :
-            filedata = file.read()
-
-            if adblock_usado :
-                filedata = filedata.replace(b'stats.adblock = false;', b'stats.adblock = true;')
-            else :
-                filedata = filedata.replace(b'stats.adblock = true;', b'stats.adblock = false;')
-
-        with open(f, 'wb') as file:
-            file.write(filedata)
-
-
-def toggle_resolution(resolution_type) :
-    f = os.path.join(extensao_coleta,'atfindex.js')
-    if os.path.isfile(f):
-        with open(f, 'rb') as file :
-            filedata = file.read()
-
-            if resolution_type == 1 :
-                filedata = filedata.replace(b'stats.resolution_type = 2;', b'stats.resolution_type = 1;')
-            elif resolution_type == 2 :
-                filedata = filedata.replace(b'stats.resolution_type = 1;', b'stats.resolution_type = 2;')
-
-        with open(f, 'wb') as file:
-            file.write(filedata)
-
-
-def writeToTop100(domain_list) :
-    with open(alexa_top_100, 'w') as f :
+def writeToList(domain_list) :
+    with open(navigation_sample_list, 'w') as f :
         for i in range(0, len(domain_list)) :
             if i == 0:
                 f.write(domain_list[i])
@@ -75,8 +45,8 @@ def writeToTop100(domain_list) :
                 f.write('\n{}'.format(domain_list[i]))
 
 
-def readFromTop100() :
-    with open(alexa_top_100, 'r') as f :
+def readFromList() :
+    with open(navigation_sample_list, 'r') as f :
         lines = f.readlines()
         lines = [line.rstrip() for line in lines]
         return lines
@@ -98,37 +68,24 @@ def main():
         with open(arquivo_controle_mudanca, 'w') as f:
             f.write('ok!')
 
-    # uso ou não de adblock
-    adblock_usado = False
-    if random.random() < 0.5 :
-        adblock_usado = True
-
-    toggle_adblock(adblock_usado)
-
-    resType = 1
-    if random.random() >= 0.5 :
-        resType = 2
-
-    toggle_resolution(resType)
-
     # choose domain to perform experiment
-    if os.path.isfile(alexa_top_100):
-        domain_list = readFromTop100()
+    if os.path.isfile(navigation_sample_list):
+        domain_list = readFromList()
     else:
         domain_list = []
 
     if (len(domain_list) == 0) :
-        # reset top 100 list
-        df = pd.read_csv(alexa_top_100_brasil)
+        # reset navigation list
+        df = pd.read_csv(navigation_list)
         df.columns = ['rank', 'domain', 'monthly traffic', 'pages per visit', 'time on site']
         domain_list = df['domain'].tolist()
-        writeToTop100(domain_list)
+        writeToList(domain_list)
 
     domain, domain_list = chooseAtRandom(domain_list)
 
-    writeToTop100(domain_list)
+    writeToList(domain_list)
 
-    print('http://www.{} {} {}'.format(domain, adblock_usado, resType))
+    print('http://www.{}'.format(domain))
 
 
 if __name__ == "__main__":

@@ -7,8 +7,6 @@ macFile="/home/pi/wptagent-automation/mac"
 versionFile="/home/pi/wptagent-automation/version"
 newVersionFile="/home/pi/wptagent-automation/new_version"
 updateScript="/home/pi/wptagent-automation/scripts/update.sh"
-statusFile="/home/pi/wptagent-automation/status"
-statusControlScript="/home/pi/wptagent-automation/scripts/status/status_control.sh"
 
 collectionServerUrl=$(cat /home/pi/wptagent-automation/collection_server_url)
 collectionServerUser=$(cat /home/pi/wptagent-automation/collection_server_user)
@@ -34,9 +32,6 @@ while [ $iteration -lt $max_iterations ]; do
         iteration=$((iteration + 1))
         continue
     fi
-
-    # This checks if wpt test has been started via wpt server
-    bash $statusControlScript
 
     if [ -f $wptOngoingFilePath ]; then
         wptOngoing=$(cat $wptOngoingFilePath)

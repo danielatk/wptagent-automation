@@ -21,40 +21,19 @@ arquivo_porta_ssh_servidor = '/home/pi/wptagent-automation/collection_server_ssh
 def main():
     args = sys.argv
 
-    if (len(args) != 4) :
-        print('inform url, adblock use and resolution type')
+    if (len(args) != 2) :
+        # first argument is the url to be reproduced
+        print('inform url')
         return
 
-    # first argument is the url to be reproduced
-    # second argument is if adblock should be used
-    # third argument is the viewport resolution (1 or 2)
-
-    # opções do chrome
-    chrome_options = Options()
-    if (args[2] == 'True') :
-        # add adblock extension
-        chrome_options.add_extension(extensao_adblock_crx)
-    
     # browser log
     d = DesiredCapabilities.CHROME
     d['goog:loggingPrefs'] = { 'browser':'ALL' }
     
-    driver = webdriver.Chrome(desired_capabilities=d, options = chrome_options)
+    driver = webdriver.Chrome(desired_capabilities=d)
     driver.execute_cdp_cmd("Network.setCacheDisabled", {"cacheDisabled":True})
     
-    # resolução da tela (https://gs.statcounter.com/screen-resolution-stats/desktop/worldwide)
-    res1 = [1920, 1080]
-    res2 = [1366, 768]
-    if (args[3] == '1') :
-        driver.set_window_size(res1[0], res1[1], driver.window_handles[0])
-    elif (args[3] == '2') :
-        driver.set_window_size(res2[0], res2[1], driver.window_handles[0])
-
-    if (args[2] == 'True'): # adblock use
-        window = driver.current_window_handle
-        for w in driver.window_handles:
-            if w != window:
-                driver.switch_to.window(w)
+    driver.set_window_size(1920, 1080, driver.window_handles[0])
 
     driver.get(args[1])
 
@@ -114,20 +93,6 @@ def main():
         except NoSuchElementException:
             time.sleep(1)
             pass
-
-    # while True:
-    #     fullscreen = driver.find_elements('class name', 'ytp-fullscreen-button')
-    #     fullscreen_btn = fullscreen[len(fullscreen)-1]
-    #     while True:
-    #         try:
-    #             fullscreen_btn.click()
-    #             break
-    #         except WebDriverException:
-    #             pass
-    #     #if fullscreen_btn.is_displayed() and fullscreen_btn.is_enabled():
-    #         #fullscreen_btn.click()
-    #         #break
-    #     break
 
     if not found_fullscreen or len(fullscreen) == 0:
         driver.quit()
@@ -275,7 +240,7 @@ def main():
         # if int(progress) >= 60:
         #     break
 
-        if time.time() - begin_time >= 70:
+        if time.time() - begin_time >= 50:
             break
 
         indicator_end = driver.find_elements('class name', 'ytp-videowall-still-info-content')
@@ -294,7 +259,7 @@ def main():
     index = args[1].find('watch?v=')
     video_id = args[1][index+8:]
 
-    filename = '/home/pi/wptagent-automation/sfn_data/{}_{}_{}_webdriver_sfn.json'.format(video_id, mac, begin_time)
+    filename = '/home/pi/wptagent-automation/sfn_data/{}_{}_{}_sfn.json'.format(video_id, mac, begin_time)
 
     with open(filename, 'w') as outfile:
         outfile.write(json_stats_for_nerds)
@@ -311,7 +276,7 @@ def main():
     with open(arquivo_porta_ssh_servidor, 'r') as f:
         porta_ssh_servidor = f.read().rstrip()
 
-    command = 'scp -o StrictHostKeyChecking=no -P {} /home/pi/wptagent-automation/sfn_data/{}_{}_{}_webdriver_sfn.json {}@{}:~/wptagent-control/other_data'.format(porta_ssh_servidor, video_id, mac, begin_time, usuario_servidor, url_servidor)
+    command = 'scp -o StrictHostKeyChecking=no -P {} /home/pi/wptagent-automation/sfn_data/{}_{}_{}_sfn.json {}@{}:~/wptagent-control/other_data'.format(porta_ssh_servidor, video_id, mac, begin_time, usuario_servidor, url_servidor)
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
     output1, error1 = process.communicate()
 
