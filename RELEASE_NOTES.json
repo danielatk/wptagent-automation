@@ -1,10 +1,19 @@
 {
-	"latest_version": "1.5.0",
+	"latest_version": "1.5.1",
 	"x.y.z": {
 		"about": "Example. Leave this ALWAYS here!. INCLUDE ALL THE KEYS, EVEN WITH EMPTY ARRAYS!",
 		"fixes": ["We fixed A", "We fixed B"],
 		"improvements": [],
 		"features": ["We added C", "Now D is possible"]
+	},
+	"1.5.1": {
+		"fixes": [
+			"We changed log message to listen to trigger end of puppeteer test"
+		],
+		"improvements": [
+		],
+		"features": [
+		]
 	},
 	"1.5.0": {
 		"fixes": [
