@@ -1,10 +1,19 @@
 {
-	"latest_version": "1.5.1",
+	"latest_version": "1.6.0",
 	"x.y.z": {
 		"about": "Example. Leave this ALWAYS here!. INCLUDE ALL THE KEYS, EVEN WITH EMPTY ARRAYS!",
 		"fixes": ["We fixed A", "We fixed B"],
 		"improvements": [],
 		"features": ["We added C", "Now D is possible"]
+	},
+	"1.6.0": {
+		"fixes": [
+		],
+		"improvements": [
+			"We modified the navigation list"
+		],
+		"features": [
+		]
 	},
 	"1.5.1": {
 		"fixes": [
