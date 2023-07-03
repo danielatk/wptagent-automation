@@ -17,8 +17,6 @@ services:
   wptagent:
     image: carloscdias/wptagent
     container_name: wpa_agent-container
-    env_file:
-      - wpa_agent.env
     environment:
       - SERVER_URL="$SERVER_URL"
       - LOCATION="$LOCATION"

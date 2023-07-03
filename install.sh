@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+#  curl -fsSL https://raw.githubusercontent.com/carloscdias/wptagent-automation/main/install.sh -o - | bash
+
 BASE_DIR='/home/pi/wptagent-automation'
 
 
