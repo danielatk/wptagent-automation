@@ -50,5 +50,5 @@ echo "KEY=\"${KEY}\"" >> .env
 echo "NAME=\"${NAME}\"" >> .env
 echo "SHAPER=\"${SHAPER}\"" >> .env
 # start services
-sudo docker compose up -d
+sudo docker compose up -d --build
 echo 'Installation completed. Agent is running.'
