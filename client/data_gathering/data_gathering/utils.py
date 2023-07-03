@@ -23,7 +23,7 @@ def call_ndt7(server = None):
     return result
 
 def parser_ndt_output(output):
-    return [json.loads(x) for x in output.decode('utf-8').split('\n')]
+    return [json.loads(x) for x in bytes(output).decode('utf-8').split('\n')]
 
 def ndt_experiment(has_ipv6: bool):
     uf = get_random_uf()
