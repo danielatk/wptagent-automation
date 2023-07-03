@@ -21,10 +21,13 @@ def set_extension_options(database, options: dict):
         - verbosity: string
         - save_file: int
     """
-    db = levelDB.DB(database, create_if_missing=True)
-    for key, value in options.items():
-        db.put(key.encode(), json.dumps(value).encode())
-    db.close()
+    try:
+        db = levelDB.DB(database, create_if_missing=True)
+        for key, value in options.items():
+            db.put(key.encode(), json.dumps(value).encode())
+        db.close()
+    except Exception as err:
+        print(err)
     
 def setup_chrome(use_adblock: bool, resolution_type: int):
     # opções do chrome
