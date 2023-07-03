@@ -9,7 +9,7 @@ VERSION_FILE = '/app/version'
 VERSION = None
 EXPERIMENT_TYPES = ['navigation', 'reproduction']
 
-EXTENSION_DB = '/data/chrome/data_gathering_agent/Sync Extension Settings/ojaljkmpomphjjkkgkdhenlhogcajbmf/'
+EXTENSION_DB = '/data/chrome/data_gathering_agent/Sync Extension Settings/ojaljkmpomphjjkkgkdhenlhogcajbmf'
 
 def call_program(program):
     result = subprocess.run(program, capture_output=True)

@@ -9,21 +9,21 @@ services:
       - NET_ADMIN
     environment:
       - DISPLAY=:2
-      - QUEUE="$QUEUE"
-      - BACKEND="$BACKEND"
-      - BROKER="$BROKER"
+      - QUEUE=$QUEUE
+      - BACKEND=$BACKEND
+      - BROKER=$BROKER
     volumes:
       - data_gathering_volume:/data
   wptagent:
     image: carloscdias/wptagent
     container_name: wpa_agent-container
     environment:
-      - SERVER_URL="$SERVER_URL"
-      - LOCATION="$LOCATION"
-      - KEY="$KEY"
-      - NAME="$NAME"
-      - SHAPER="$SHAPER"
-      - EXTRA_ARGS="$EXTRA_ARGS"
+      - SERVER_URL=$SERVER_URL
+      - LOCATION=$LOCATION
+      - KEY=$KEY
+      - NAME=$NAME
+      - SHAPER=$SHAPER
+      - EXTRA_ARGS=$EXTRA_ARGS
     command: python3 wptagent.py -vvvv --xvfb --dockerized --server $SERVER_URL --location $LOCATION --key $KEY
   watchtower:
     image: containrrr/watchtower
