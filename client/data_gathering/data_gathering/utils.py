@@ -146,7 +146,7 @@ def send_results_and_delete(app, task):
                 # with allow_join_result():
                 # t = app.send_task(task, [json.loads(r.payload)], routing_key=task, exchange='writers')
                 # t.get()
-                app.send_task(task, [json.loads(r.payload)], routing_key=task, exchange='writers')
+                app.send_task(task, [json.loads(r.payload)], routing_key=task, exchange='data_gathering')
                 remove_saved_results([r])
         except Exception as err:
             logger.info('Error when sending task to server: %s', err, exc_info=1)

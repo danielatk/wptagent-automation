@@ -31,6 +31,10 @@ app.conf.beat_schedule = {
     'get-results-from-devices': {
         'task': 'writers.get_worker_results',
         'schedule': crontab(minute='*/30'),
+        'options': {
+            'routing_key': 'writers.get_worker_results',
+            'exchange': 'data_gathering',
+        },
     },
 }
 app.conf.timezone = 'UTC'
