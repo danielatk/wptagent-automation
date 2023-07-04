@@ -8,6 +8,11 @@ from .utils import *
 
 EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL = 30
 
+@app.task(name='data_gathering.send_tasks')
+@app.task(name=f'{QUEUE}.data_gathering.send_tasks')
+def send_tasks_to_server():
+    send_results_and_delete(app, 'writers.save')
+    
 @app.task(name='data_gathering.traceroute')
 @app.task(name=f'{QUEUE}.data_gathering.traceroute')
 def traceroute(domain):
@@ -68,7 +73,7 @@ def experimento_1(schedule_next: bool = False):
         'started': now,
         'mac': mac,
     }
-    # agenda APS
+    # schedule APS
     if schedule_next:
         time_in_minutes = expon.rvs(scale=int(EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL), size=1)[0]
         next_run = now + timedelta(minutes=time_in_minutes)
@@ -96,4 +101,6 @@ def experimento_1(schedule_next: bool = False):
         result['browser'][method] = run_func(url, use_adblock, resolution_type, mac, SERVER)
     # ndt
     result['ndt'] = ndt_experiment(IPV6)
+    # save and send
+    save_and_send(result, app)
     return result

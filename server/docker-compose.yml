@@ -4,8 +4,8 @@ services:
     image: rabbitmq:3.12-management
     hostname: rabbit-server
     environment:
-      - RABBITMQ_DEFAULT_USER="$RABBITMQ_DEFAULT_USER"
-      - RABBITMQ_DEFAULT_PASS="$RABBITMQ_DEFAULT_PASS"
+      - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
     ports:
       - "5672:5672"
       - "8080:15672"
@@ -14,9 +14,20 @@ services:
   server:
     build: .
     environment:
-      - QUEUE="$QUEUE"
-      - BACKEND="$BACKEND"
-      - BROKER="$BROKER"
+      - QUEUE=$QUEUE
+      - BACKEND=$BACKEND
+      - BROKER=$BROKER
+    volumes:
+      - ./data:/data
+    depends_on:
+      - broker
+  beat:
+    build: .
+    environment:
+      - QUEUE=$QUEUE
+      - BACKEND=$BACKEND
+      - BROKER=$BROKER
+    command: celery -A writers beat
     depends_on:
       - broker
   flower:

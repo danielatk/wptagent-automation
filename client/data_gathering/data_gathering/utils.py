@@ -1,10 +1,11 @@
 import random
 import subprocess
 import json
-
 from typing import Tuple
+
+from data_gathering.celery import logger
 from .navigation import selenium_navigation, selenium_reproduction, set_extension_options
-from ..model import get_random_video, get_random_page, get_random_uf
+from ..model import get_random_video, get_random_page, get_random_uf, save_result, remove_saved_results, get_all_saved_results
 
 VERSION_FILE = '/app/version'
 VERSION = None
@@ -136,3 +137,16 @@ def get_browser_experiment_func(experiment_type):
         [selenium_navigation_experiment, puppeteer_navigation_experiment],
         [selenium_reproduction_experiment, puppeteer_reproduction_experiment],
     ]))[experiment_type]
+
+def send_results_and_delete(app, task):
+    saved_results = get_all_saved_results()
+    try:
+        for r in saved_results:
+            app.send_task(task, r.payload, routing_key=task, exchange='data_gathering')
+            remove_saved_results([r])
+    except Exception as err:
+        logger.info('Error when sending task to server: %s', err, exc_info=1)
+
+def save_and_send(result: dict, app):
+    save_result(result)
+    send_results_and_delete(app, 'writers.save')

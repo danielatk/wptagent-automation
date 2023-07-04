@@ -1,4 +1,4 @@
-from sqlalchemy import String, update, create_engine
+from sqlalchemy import String, update, delete, create_engine
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import mapped_column
@@ -40,6 +40,30 @@ class Page(Base):
     def get_url(self):
         return f'http://{self.domain}'
 
+class SavedResult(Base):
+    __tablename__ = "saved_result"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    payload: Mapped[dict]
+
+
+def get_all_saved_results():
+    engine = get_database_engine()
+    with Session(engine, expire_on_commit=False) as session, session.begin():
+        return session.query(SavedResult).all()
+
+def remove_saved_results(saved_results):
+    engine = get_database_engine()
+    with Session(engine, expire_on_commit=False) as session, session.begin():
+        return session.execute(delete(SavedResult).filter(SavedResult.id.in_([s.id for s in saved_results])))
+
+def save_result(result):
+    engine = get_database_engine()
+    with Session(engine) as session, session.begin():
+        saved_result = SavedResult()
+        saved_result.payload = result
+        session.add(saved_result)
+    
 def get_random_instance(clazz):
     engine = get_database_engine()
     with Session(engine, expire_on_commit=False) as session, session.begin():

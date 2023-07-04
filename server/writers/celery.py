@@ -1,6 +1,7 @@
 import os
 from celery import Celery
 from celery.utils.log import get_task_logger
+from celery.schedules import crontab
 from kombu import Exchange, Queue, binding
 
 BACKEND = os.environ.get('BACKEND', 'rpc://guest:guest@localhost/')
@@ -23,6 +24,14 @@ app.conf.task_queues = (
         binding(exchange, routing_key='writers.#'),
     ]),
 )
+
+app.conf.beat_schedule = {
+    'get-results-from-devices': {
+        'task': 'writers.get_worker_results',
+        'schedule': crontab(minute='*/30'),
+    },
+}
+app.conf.timezone = 'UTC'
 
 # Optional configuration, see the application user guide.
 app.conf.update(result_expires=3600)
