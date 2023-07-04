@@ -68,10 +68,10 @@ def experimento_1(schedule_next: bool = False):
         - realiza o teste ndt
     """
     mac = QUEUE[4:]
-    now = datetime.now().timestamp()
+    now = datetime.now()
     result = {
         'task': 'experimento_1',
-        'started': now,
+        'started': now.timestamp(),
         'mac': mac,
     }
     # schedule APS
@@ -103,5 +103,6 @@ def experimento_1(schedule_next: bool = False):
     # ndt
     result['ndt'] = ndt_experiment(IPV6)
     # save and send
+    result['ended'] = datetime.now().timestamp()
     save_and_send(result, app)
     return result

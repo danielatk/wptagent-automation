@@ -16,6 +16,8 @@ app = Celery('data_gathering',
             include=['writers.writers.tasks'])
 
 app.conf.task_create_missing_queues = False
+app.conf.broker_connection_retry_on_startup = True
+app.conf.broker_connection_max_retries = None # try forever
 
 exchange = Exchange('data_gathering', type='topic')
 app.conf.task_queues = (
