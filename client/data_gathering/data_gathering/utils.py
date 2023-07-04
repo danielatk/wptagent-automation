@@ -2,6 +2,7 @@ import random
 import subprocess
 import json
 
+from typing import Tuple
 from .navigation import selenium_navigation, selenium_reproduction, set_extension_options
 from ..model import get_random_video, get_random_page, get_random_uf
 
@@ -11,11 +12,11 @@ EXPERIMENT_TYPES = ['navigation', 'reproduction']
 
 EXTENSION_DB = '/data/chrome/data_gathering_agent/Sync Extension Settings/ojaljkmpomphjjkkgkdhenlhogcajbmf'
 
-def call_program(program):
+def call_program(program) -> Tuple[bytes, bytes]:
     result = subprocess.run(program, capture_output=True)
     return result.stdout, result.stderr
 
-def call_ndt7(server = None):
+def call_ndt7(server = None) -> bytes:
     command = ['ndt7-client', '-no-verify', '-scheme', 'wss', '-format', 'json']
     if server:
         command += ['-server', server]
@@ -23,7 +24,7 @@ def call_ndt7(server = None):
     return result
 
 def parser_ndt_output(output):
-    return [json.loads(x) for x in bytes(output).decode('utf-8').split('\n')]
+    return [json.loads(x) for x in output.decode('utf-8').split()]
 
 def ndt_experiment(has_ipv6: bool):
     uf = get_random_uf()
@@ -31,8 +32,8 @@ def ndt_experiment(has_ipv6: bool):
         'uf': uf,
     }
     if uf == 'mlab':
-        result = call_ndt7().decode('utf-8')
-        result['ndt'] = parser_ndt_output(result)
+        ndt = call_ndt7()
+        result['ndt'] = parser_ndt_output(ndt)
         # get server fqdn
         server = get_server_fqdn_from_ndt(result['ndt'])
         result['traceroute-4'] = call_traceroute(server)
@@ -40,7 +41,8 @@ def ndt_experiment(has_ipv6: bool):
             result['traceroute-6'] = call_traceroute(server, True)
     else:
         server = f'{uf}.medidor.rnp.br'
-        result['ndt'] = call_ndt7(f'{server}:4443').decode('utf-8')
+        ndt = call_ndt7(f'{server}:4443')
+        result['ndt'] = parser_ndt_output(ndt)
         result['traceroute-4'] = call_traceroute(server)
     return result
 
