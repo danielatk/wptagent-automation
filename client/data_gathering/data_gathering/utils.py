@@ -3,6 +3,7 @@ import subprocess
 import json
 from typing import Tuple
 
+from celery.result import allow_join_result
 from data_gathering.celery import logger
 from .navigation import selenium_navigation, selenium_reproduction, set_extension_options
 from ..model import get_random_video, get_random_page, get_random_uf, save_result, remove_saved_results, get_all_saved_results
@@ -142,9 +143,10 @@ def send_results_and_delete(app, task):
     saved_results = get_all_saved_results()
     for r in saved_results:
         try:
-                t = app.send_task(task, [json.loads(r.payload)], routing_key=task, exchange='data_gathering')
-                t.get()
-                remove_saved_results([r])
+                with allow_join_result():
+                    t = app.send_task(task, [json.loads(r.payload)], routing_key=task, exchange='data_gathering')
+                    t.get()
+                    remove_saved_results([r])
         except Exception as err:
             logger.info('Error when sending task to server: %s', err, exc_info=1)
 
