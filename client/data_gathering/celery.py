@@ -1,5 +1,4 @@
 import os
-import sys
 import logging
 from pytz import utc
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -61,5 +60,5 @@ if __name__ == '__main__':
     logger.info('Scheduler started.')
     logger.info('Running celery application...')
     worker = app.Worker()
-    worker.start(sys.argv)
+    worker.start()
     logger.info('Done.')
