@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 from pytz import utc
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -47,7 +48,7 @@ exchange = Exchange('data_gathering', type='topic')
 app.conf.task_queues = (
     Queue(f'data_gathering.{QUEUE}', exchange=exchange, bindings=[
         binding(exchange, routing_key=f'{QUEUE}.data_gathering.#'),
-        binding(exchange, routing_key=f'data_gathering.#'),
+        binding(exchange, routing_key='data_gathering.#'),
     ]),
 )
 
@@ -59,5 +60,6 @@ if __name__ == '__main__':
     scheduler.start()
     logger.info('Scheduler started.')
     logger.info('Running celery application...')
-    app.start()
+    worker = app.Worker()
+    worker.start(sys.argv)
     logger.info('Done.')
