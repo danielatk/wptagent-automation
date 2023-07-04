@@ -144,7 +144,7 @@ def send_results_and_delete(app, task):
     for r in saved_results:
         try:
                 with allow_join_result():
-                    t = app.send_task(task, [json.loads(r.payload)], routing_key=task, exchange='data_gathering')
+                    t = app.send_task(task, [json.loads(r.payload)], routing_key=task, exchange='writers')
                     t.get()
                     remove_saved_results([r])
         except Exception as err:

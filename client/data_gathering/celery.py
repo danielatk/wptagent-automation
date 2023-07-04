@@ -1,4 +1,5 @@
 import os
+import logging
 from pytz import utc
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
@@ -6,6 +7,9 @@ from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from celery import Celery
 from celery.utils.log import get_task_logger
 from kombu import Exchange, Queue, binding
+
+logging.basicConfig()
+logging.getLogger('apscheduler').setLevel(logging.DEBUG)
 
 BACKEND = os.environ.get('BACKEND', 'rpc://guest:guest@localhost/')
 BROKER  = os.environ.get('BROKER', 'amqp://guest:guest@localhost/')
@@ -51,5 +55,9 @@ app.conf.task_queues = (
 app.conf.update(result_expires=3600)
 
 if __name__ == '__main__':
+    logger.info('Starting scheduler...')
     scheduler.start()
+    logger.info('Scheduler started.')
+    logger.info('Running celery application...')
     app.start()
+    logger.info('Done.')
