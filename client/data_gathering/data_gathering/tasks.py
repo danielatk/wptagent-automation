@@ -68,8 +68,9 @@ def experimento_1(schedule_next: bool = False):
         - realiza o teste ndt
     """
     mac = QUEUE[4:]
-    now = datetime.now()
+    now = datetime.now().timestamp()
     result = {
+        'task': 'experimento_1',
         'started': now,
         'mac': mac,
     }

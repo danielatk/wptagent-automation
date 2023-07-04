@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy import String, update, delete, create_engine
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import Session
@@ -44,7 +46,7 @@ class SavedResult(Base):
     __tablename__ = "saved_result"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    payload: Mapped[dict]
+    payload: Mapped[str]
 
 
 def get_all_saved_results():
@@ -61,7 +63,7 @@ def save_result(result):
     engine = get_database_engine()
     with Session(engine) as session, session.begin():
         saved_result = SavedResult()
-        saved_result.payload = result
+        saved_result.payload = json.dumps(result)
         session.add(saved_result)
     
 def get_random_instance(clazz):

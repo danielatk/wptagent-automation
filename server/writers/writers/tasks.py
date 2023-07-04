@@ -7,7 +7,7 @@ SAVE_DIR = '/data'
 def save_ndt_file(payload):
     ndt = payload['ndt']
     device = payload['mac'].replace(':', '')
-    time = int(payload['started'].timestamp())
+    time = int(payload['started'])
     base = f'{device}_{time}_{ndt["uf"]}'
     with open(f'{SAVE_DIR}/{base}_ndt.json', 'w') as f:
         f.writelines([json.dumps(n) for n in ndt['ndt']])
