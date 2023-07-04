@@ -2,4 +2,4 @@
 
 export DISPLAY=:2
 Xorg -noreset +extension GLX +extension RANDR +extension RENDER -logfile /dev/null -config /app/resources/xorg.conf :2 &
-python -m data_gathering.celery -Q data_gathering.${QUEUE} -n ${QUEUE} -l info -E
+python -m data_gathering.celery

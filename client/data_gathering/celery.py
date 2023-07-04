@@ -59,5 +59,5 @@ if __name__ == '__main__':
     scheduler.start()
     logger.info('Scheduler started.')
     logger.info('Running celery application...')
-    app.start()
+    app.start(['-Q', f'data_gathering.{QUEUE}', '-n', QUEUE, '-l', 'info', '-E'])
     logger.info('Done.')
