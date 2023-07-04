@@ -2,8 +2,8 @@ version: "3.9"
 services:
   agent:
     user: "$UID"
-    # build: .
-    image: carloscdias/data_gathering
+    build: .
+    image: carloscdias/data_gathering:latest
     container_name: data_gathering-container
     cap_add:
       - NET_ADMIN
