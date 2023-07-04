@@ -15,7 +15,7 @@ EXTENSION_DB = '/data/chrome/data_gathering_agent/Sync Extension Settings/ojaljk
 
 def call_program(program) -> Tuple[bytes, bytes]:
     result = subprocess.run(program, capture_output=True)
-    return result.stdout, result.stderr
+    return result.stdout.decode('utf-8'), result.stderr.decode('utf-8')
 
 def call_ndt7(server = None) -> bytes:
     command = ['ndt7-client', '-no-verify', '-scheme', 'wss', '-format', 'json']
@@ -25,7 +25,7 @@ def call_ndt7(server = None) -> bytes:
     return result
 
 def parser_ndt_output(output):
-    return [json.loads(x) for x in output.decode('utf-8').split()]
+    return [json.loads(x) for x in output.split()]
 
 def ndt_experiment(has_ipv6: bool):
     uf = get_random_uf()
