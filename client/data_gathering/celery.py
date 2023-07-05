@@ -9,7 +9,7 @@ from celery.utils.log import get_task_logger
 from kombu import Exchange, Queue, binding
 
 logging.basicConfig()
-logging.getLogger('apscheduler').setLevel(logging.DEBUG)
+logging.getLogger('apscheduler').setLevel(logging.INFO)
 
 BACKEND = os.environ.get('BACKEND', 'rpc://guest:guest@localhost/')
 BROKER  = os.environ.get('BROKER', 'amqp://guest:guest@localhost/')
@@ -55,9 +55,6 @@ app.conf.task_queues = (
 app.conf.update(result_expires=3600)
 
 if __name__ == '__main__':
-    logger.info('Starting scheduler...')
-    scheduler.start()
-    logger.info('Scheduler started.')
     logger.info('Running celery application...')
     app.start(['worker', '-Q', f'data_gathering.{QUEUE}', '-n', QUEUE, '-l', 'info', '-E'])
     logger.info('Done.')

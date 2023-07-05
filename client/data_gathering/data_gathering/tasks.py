@@ -8,6 +8,10 @@ from .utils import *
 
 EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL = 30
 
+if not scheduler.running:
+    scheduler.start()
+    experimento_1(True)
+
 @app.task(name='data_gathering.send_tasks')
 @app.task(name=f'{QUEUE}.data_gathering.send_tasks')
 def send_tasks_to_server():
@@ -38,9 +42,9 @@ def get_queue():
 @app.task(name=f'{QUEUE}.data_gathering.local_schedule')
 def local_schedule(func: str, schedule: str, kwargs: dict):
     FUNC_NAME_TO_FUNC = {
-        'experimento_1': experimento_1,
-        'ndt7': ndt7,
-        'traceroute': traceroute,
+        'experimento_1': 'data_gathering.data_gathering.tasks:experimento_1',
+        'ndt7': 'data_gathering.data_gathering.tasks:ndt7',
+        'traceroute': 'data_gathering.data_gathering.tasks:traceroute',
     }
     if func not in FUNC_NAME_TO_FUNC:
         raise ValueError()
