@@ -1,53 +1,94 @@
-# -*- coding: utf-8 -*-
-
-from datetime import datetime
-import subprocess
-import re
 import time
-import sys
+import json
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver import ActionChains
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.chromium.service import ChromiumService
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
+import plyvel as levelDB
 
-extensao_adblock_crx = '/home/pi/wptagent-automation/extensions/adblock.crx'
-arquivo_log = '/home/pi/wptagent-automation/log'
-arquivo_mac = '/home/pi/wptagent-automation/mac'
-arquivo_url_servidor = '/home/pi/wptagent-automation/collection_server_url'
-arquivo_usuario_servidor = '/home/pi/wptagent-automation/collection_server_user'
-arquivo_porta_ssh_servidor = '/home/pi/wptagent-automation/collection_server_ssh_port'
+EXTENSAO_COLETA = '/app/resources/extensions/ATF-chrome-plugin/'
+EXTENSAO_ADBLOCK_CRX = '/app/resources/extensions/adblock.crx'
 
-def main():
-    args = sys.argv
-
-    if (len(args) != 2) :
-        # first argument is the url to be reproduced
-        print('inform url')
-        return
-
+def set_extension_options(database, options: dict):
+    """
+        main keys:
+        - puppeteer: bool
+        - adblock: bool
+        - resolution_type: int
+        - server_address: string
+        - mac: string
+        - verbosity: string
+        - save_file: int
+    """
+    try:
+        db = levelDB.DB(database, create_if_missing=True)
+        for key, value in options.items():
+            db.put(key.encode(), json.dumps(value).encode())
+        db.close()
+    except Exception as err:
+        print(err)
+    
+def setup_chrome(use_adblock: bool, resolution_type: int):
+    # opções do chrome
+    chrome_options = webdriver.ChromeOptions()
+    extensoes = EXTENSAO_COLETA
+    if use_adblock:
+        # add adblock extension
+        chrome_options.add_extension(EXTENSAO_ADBLOCK_CRX)
+    chrome_options.add_argument(f'--load-extension={extensoes}')
+    chrome_options.add_argument('--user-data-dir=/data/chrome')
+    chrome_options.add_argument('--profile-directory=data_gathering_agent')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--verbose')
+    chrome_options.add_argument('--log-path=/data/ChromeDriver.log')
     # browser log
-    d = DesiredCapabilities.CHROME
-    d['goog:loggingPrefs'] = { 'browser':'ALL' }
-    
-    driver = webdriver.Chrome(desired_capabilities=d)
-    driver.execute_cdp_cmd("Network.setCacheDisabled", {"cacheDisabled":True})
-    
-    driver.set_window_size(1920, 1080, driver.window_handles[0])
+    chrome_options.set_capability('goog:loggingPrefs', { 'browser': 'ALL' })
+    service = ChromiumService(executable_path='/usr/bin/chromedriver')
+    driver = webdriver.Chrome(options=chrome_options, service=service)
+    # driver = webdriver.Chrome(options=chrome_options)
+    driver.execute_cdp_cmd('Network.setCacheDisabled', { 'cacheDisabled': True })
+    # resolução da tela (https://gs.statcounter.com/screen-resolution-stats/desktop/worldwide)
+    resolution = {
+        1: [1920, 1080],
+        2: [1366, 768],
+    }
+    driver.set_window_size(resolution[resolution_type][0], resolution[resolution_type][1], driver.window_handles[0])
+    if use_adblock: # adblock use
+        window = driver.current_window_handle
+        for w in driver.window_handles:
+            if w != window:
+                driver.switch_to.window(w)
+    return driver
 
-    driver.get(args[1])
+def wait_atf_extension(driver, max_wait_s):
+    message = 'chrome-extension://ojaljkmpomphjjkkgkdhenlhogcajbmf/atfindex.js 343:16 "saved last session stats"'
+    logs = []
+    for _ in range(max_wait_s*2):
+        time.sleep(0.5)
+        log = driver.get_log('browser')
+        if len(log) > 0:
+            logs += log
+            if logs[-1]['message'] == message:
+                break
+    return logs
 
-    # with open(arquivo_log, 'a') as file :
-    #     file.write("reproduction WEBDRIVER -> test begun successfully")
-    #     file.write("reproduction WEBDRIVER -> browser log:")
-    #     for entry in driver.get_log('browser'):
-    #         file.write(str(entry))
-    #         file.write('\n\n')
+def selenium_navigation(url: str, use_adblock: bool, resolution_type: int):
+    driver = setup_chrome(use_adblock, resolution_type)
+    driver.get(url)
+    logs = wait_atf_extension(driver, 100)
+    driver.quit()
+    return logs
 
-    seconds_timeout = 10
-    found_player = False
 
-    for _ in range(seconds_timeout):
+def selenium_reproduction(url, use_adblock, resolution_type):
+    driver = setup_chrome(use_adblock, resolution_type)
+    driver.get(url)
+
+    beginning = datetime.timestamp(datetime.now())
+
+    while True:
         try:
             video = driver.find_element('id', 'ytd-player')
             found_player = True
@@ -248,38 +289,9 @@ def main():
             break
 
     ending = datetime.timestamp(datetime.now())
-
     json_stats_for_nerds += '],"et":'
     json_stats_for_nerds += str(ending)
     json_stats_for_nerds += '}'
-
-    with open(arquivo_mac, 'r') as f:
-        mac = f.read().rstrip()
-
-    index = args[1].find('watch?v=')
-    video_id = args[1][index+8:]
-
-    filename = '/home/pi/wptagent-automation/sfn_data/{}_{}_{}_sfn.json'.format(video_id, mac, begin_time)
-
-    with open(filename, 'w') as outfile:
-        outfile.write(json_stats_for_nerds)
-        outfile.close
-
     time.sleep(1)
-
     driver.quit()
-
-    with open(arquivo_url_servidor, 'r') as f:
-        url_servidor = f.read().rstrip()
-    with open(arquivo_usuario_servidor, 'r') as f:
-        usuario_servidor = f.read().rstrip()
-    with open(arquivo_porta_ssh_servidor, 'r') as f:
-        porta_ssh_servidor = f.read().rstrip()
-
-    command = 'scp -o StrictHostKeyChecking=no -P {} /home/pi/wptagent-automation/sfn_data/{}_{}_{}_sfn.json {}@{}:~/wptagent-control/other_data'.format(porta_ssh_servidor, video_id, mac, begin_time, usuario_servidor, url_servidor)
-    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
-    output1, error1 = process.communicate()
-
-
-if __name__ == "__main__":
-    main()
+    return json_stats_for_nerds
