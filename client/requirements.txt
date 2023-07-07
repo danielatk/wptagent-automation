@@ -1,0 +1,9 @@
+celery[amqp]
+scipy
+pandas
+selenium
+SQLAlchemy
+sqlalchemy-utils
+plyvel
+apscheduler
+python-dotenv

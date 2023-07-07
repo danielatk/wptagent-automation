@@ -1,8 +1,4 @@
-chrome_desktop.py
-sueste_password
-top-1m.csv
-webpagetest.py
-top-100-br.csv
-scripts/puppeteer/puppeteer_navigation/package-lock.json
-scripts/puppeteer/puppeteer_navigation/package.json
-scripts/puppeteer/puppeteer_navigation/node_modules/
+*.pyc
+__pycache__
+*.env
+!.env.sample

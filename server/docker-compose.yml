@@ -1,0 +1,56 @@
+version: "3.9"
+services:
+  broker:
+    image: rabbitmq:3.12-management
+    hostname: rabbit-server
+    environment:
+      - RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS
+    ports:
+      - "5672:5672"
+      - "8080:15672"
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+  server:
+    build: .
+    environment:
+      - QUEUE=$QUEUE
+      - BACKEND=$BACKEND
+      - BROKER=$BROKER
+    volumes:
+      - ./data:/data
+    depends_on:
+      - broker
+  beat:
+    build: .
+    environment:
+      - QUEUE=$QUEUE
+      - BACKEND=$BACKEND
+      - BROKER=$BROKER
+    command: celery -A writers beat
+    depends_on:
+      - broker
+  flower:
+    image: mher/flower
+    ports:
+      - "5555:5555"
+    command: celery --broker="amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@broker:5672//" flower
+    depends_on:
+      - broker
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - flower
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+     - grafana-storage:/var/lib/grafana
+    depends_on:
+      - prometheus
+volumes:
+  rabbitmq:
+  grafana-storage:
