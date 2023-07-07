@@ -7,15 +7,10 @@ from selenium.webdriver.chromium.service import ChromiumService
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
 import plyvel as levelDB
 
-EXTENSAO_COLETA = '/app/resources/extensions/ATF-chrome-plugin/'
-EXTENSAO_ADBLOCK_CRX = '/app/resources/extensions/adblock.crx'
 
 def set_extension_options(database, options: dict):
     """
         main keys:
-        - puppeteer: bool
-        - adblock: bool
-        - resolution_type: int
         - server_address: string
         - mac: string
         - verbosity: string
@@ -28,15 +23,11 @@ def set_extension_options(database, options: dict):
         db.close()
     except Exception as err:
         print(err)
-    
-def setup_chrome(use_adblock: bool, resolution_type: int):
+
+
+def setup_chrome():
     # opções do chrome
     chrome_options = webdriver.ChromeOptions()
-    extensoes = EXTENSAO_COLETA
-    if use_adblock:
-        # add adblock extension
-        chrome_options.add_extension(EXTENSAO_ADBLOCK_CRX)
-    chrome_options.add_argument(f'--load-extension={extensoes}')
     chrome_options.add_argument('--user-data-dir=/data/chrome')
     chrome_options.add_argument('--profile-directory=data_gathering_agent')
     chrome_options.add_argument('--disable-dev-shm-usage')
@@ -49,46 +40,18 @@ def setup_chrome(use_adblock: bool, resolution_type: int):
     driver = webdriver.Chrome(options=chrome_options, service=service)
     # driver = webdriver.Chrome(options=chrome_options)
     driver.execute_cdp_cmd('Network.setCacheDisabled', { 'cacheDisabled': True })
-    # resolução da tela (https://gs.statcounter.com/screen-resolution-stats/desktop/worldwide)
-    resolution = {
-        1: [1920, 1080],
-        2: [1366, 768],
-    }
-    driver.set_window_size(resolution[resolution_type][0], resolution[resolution_type][1], driver.window_handles[0])
-    if use_adblock: # adblock use
-        window = driver.current_window_handle
-        for w in driver.window_handles:
-            if w != window:
-                driver.switch_to.window(w)
+    driver.set_window_size(1920, 1080, driver.window_handles[0])
     return driver
 
-def wait_atf_extension(driver, max_wait_s):
-    message = 'chrome-extension://ojaljkmpomphjjkkgkdhenlhogcajbmf/atfindex.js 343:16 "saved last session stats"'
-    logs = []
-    for _ in range(max_wait_s*2):
-        time.sleep(0.5)
-        log = driver.get_log('browser')
-        if len(log) > 0:
-            logs += log
-            if logs[-1]['message'] == message:
-                break
-    return logs
 
-def selenium_navigation(url: str, use_adblock: bool, resolution_type: int):
-    driver = setup_chrome(use_adblock, resolution_type)
-    driver.get(url)
-    logs = wait_atf_extension(driver, 100)
-    driver.quit()
-    return logs
-
-
-def selenium_reproduction(url, use_adblock, resolution_type):
-    driver = setup_chrome(use_adblock, resolution_type)
+def selenium_reproduction(url):
+    driver = setup_chrome()
     driver.get(url)
 
-    beginning = datetime.timestamp(datetime.now())
+    seconds_timeout = 10
+    found_player = False
 
-    while True:
+    for _ in range(seconds_timeout):
         try:
             video = driver.find_element('id', 'ytd-player')
             found_player = True
@@ -289,6 +252,7 @@ def selenium_reproduction(url, use_adblock, resolution_type):
             break
 
     ending = datetime.timestamp(datetime.now())
+
     json_stats_for_nerds += '],"et":'
     json_stats_for_nerds += str(ending)
     json_stats_for_nerds += '}'

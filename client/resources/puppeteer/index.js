@@ -1,42 +1,23 @@
 const puppeteer = require('puppeteer-extra')
 
-const { DEFAULT_INTERCEPT_RESOLUTION_PRIORITY } = require('puppeteer')
-const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
-
 const args = process.argv.slice(2);
 
-if (args.length !== 3) {
-    console.log('inform url, adblock use and resolution type');
+if (args.length === 0) {
+    console.log('Please provide a URL');
     return;
 }
 
-/*
-first argument is the url to be navigated to
-second argument is if adblock should be used
-third argument is the viewport resolution (1 or 2)
-*/
-
 (async () => {
     const extensao_coleta = '/app/resources/extensions/ATF-chrome-plugin/'
-    const extensao_adblock = '/app/resources/extensions/adblock/'
+    const logToWaitFor = 'Data sent to collection server.';
+    let timeoutDuration = 18000; // Timeout duration in milliseconds
 
-    var extensoes = extensao_coleta;
-    if(args[1] == 'True') {
-        // add adblock extension
-        puppeteer.use(
-            AdblockerPlugin({
-                // Optionally enable Cooperative Mode for several request interceptors
-                interceptResolutionPriority: DEFAULT_INTERCEPT_RESOLUTION_PRIORITY
-            })
-        )
-    }
-    const browser = await puppeteer.launch(
-    {
+    const browser = await puppeteer.launch({
         headless: false,
         args: [
             `--start-maximized`,
-            `--disable-extensions-except=${extensoes}`,
-            `--load-extension=${extensoes}`,
+            `--disable-extensions-except=${extensao_coleta}`,
+            `--load-extension=${extensao_coleta}`,
             '--user-data-dir=/data/chrome',
             '--profile-directory=data_gathering_agent',
             '--disable-dev-shm-usage',
@@ -46,20 +27,38 @@ third argument is the viewport resolution (1 or 2)
         ignoreDefaultArgs: ["--disable-extension", "--enable-automation"],
         executablePath: '/usr/bin/chromium',
     });
+
     const page = await browser.newPage();
-    if (args[2] == 1) {
-        await page.setViewport({
-            width: 1920,
-            height: 1080
-        });
-    } else if (args[2] == 2) {
-        await page.setViewport({
-        width: 1366,
-        height: 768
-        });
-    }
+    await page.setViewport({ width: 1920, height: 1080 });
+
+    let logFound = false;
+
+    page.on('console', (msg) => {
+        if (msg.text().includes(logToWaitFor)) {
+            logFound = true;
+        }
+    });
+
     await page.goto(args[0]);
-    await new Promise(r => setTimeout(r, 18000));
-    await page.close();
-    await browser.close();
+
+    const waitForLog = async () => {
+        if (logFound) {
+            await page.close();
+            await browser.close();
+            return;
+        }
+
+        if (timeoutDuration <= 0) {
+            await page.close();
+            await browser.close();
+            return;
+        }
+
+        setTimeout(async () => {
+            timeoutDuration -= 100; // Reduce the timeout duration by 100 ms
+            waitForLog();
+        }, 100); // Check again after 100 ms
+    };
+
+    waitForLog();
 })()

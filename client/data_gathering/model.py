@@ -13,7 +13,7 @@ DATABASE_PATH = '/data/data_gathering.db'
 DATABASE_URL = f'sqlite:///{DATABASE_PATH}'
 
 VIDEOS_FILE_PATH = '/app/resources/videos'
-PAGES_FILE_PATH = '/app/resources/top_100_brasil.csv'
+PAGES_FILE_PATH = '/app/resources/navigation_list.csv'
 UF_FILE_PATH = '/app/resources/lista_ufs'
 
 Base = declarative_base()
@@ -91,6 +91,9 @@ def get_random_uf():
 def get_all_videos_from_file():
     videos = pd.read_csv(VIDEOS_FILE_PATH, header=None)
     return [Video(id=video_id, seen=False) for video_id in videos.iloc[0]]
+
+def get_number_of_pages_from_file():
+    return len(pd.read_csv(PAGES_FILE_PATH))
 
 def get_all_pages_from_file():
     pages = pd.read_csv(PAGES_FILE_PATH)

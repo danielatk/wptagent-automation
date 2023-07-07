@@ -5,7 +5,7 @@ from typing import Tuple
 
 from celery.result import allow_join_result
 from data_gathering.celery import logger
-from .navigation import selenium_navigation, selenium_reproduction, set_extension_options
+from .navigation import selenium_reproduction, set_extension_options
 from ..model import get_random_video, get_random_page, get_random_uf, save_result, remove_saved_results, get_all_saved_results
 
 VERSION_FILE = '/app/version'
@@ -73,70 +73,38 @@ def get_runtime_version():
         VERSION = f.read()
     return VERSION
 
-def get_experiment_type_at_random():
-    return random.choices(EXPERIMENT_TYPES)[0]
-
 def get_url_for_experiment_type(experiment_type):
     return dict(zip(EXPERIMENT_TYPES, [
         get_random_page,
         get_random_video,
     ]))[experiment_type]()
 
-def call_puppeteer(url, use_adblock, resolution_type):
-    command = ['node', '/app/resources/puppeteer/index.js', url, str(use_adblock), str(resolution_type)]
+def call_puppeteer(url):
+    command = ['node', '/app/resources/puppeteer/index.js', url]
     result, _ = call_program(command)
     return result
 
-def puppeteer_navigation(url, use_adblock, resolution_type):
-    return call_puppeteer(url, use_adblock, resolution_type)
+def puppeteer_navigation(url):
+    return call_puppeteer(url)
 
-def puppeteer_reproduction(url, use_adblock, resolution_type):
-    return call_puppeteer(url, use_adblock, resolution_type)
-
-def selenium_navigation_experiment(url, use_adblock, resolution_type, mac, server):
+def selenium_reproduction_experiment(url, mac, server):
     set_extension_options(EXTENSION_DB, {
-        'puppeteer': False,
-        'adblock': use_adblock,
-        'resolution_type': resolution_type,
         'mac': mac,
         'server_address': server,
     })
-    return selenium_navigation(url, use_adblock, resolution_type)
+    return selenium_reproduction(url)
 
-def selenium_reproduction_experiment(url, use_adblock, resolution_type, mac, server):
+def puppeteer_navigation_experiment(url, mac, server):
     set_extension_options(EXTENSION_DB, {
-        'puppeteer': False,
-        'adblock': use_adblock,
-        'resolution_type': resolution_type,
         'mac': mac,
         'server_address': server,
     })
-    return selenium_reproduction(url, use_adblock, resolution_type)
-
-def puppeteer_navigation_experiment(url, use_adblock, resolution_type, mac, server):
-    set_extension_options(EXTENSION_DB, {
-        'puppeteer': True,
-        'adblock': use_adblock,
-        'resolution_type': resolution_type,
-        'mac': mac,
-        'server_address': server,
-    })
-    return puppeteer_navigation(url, use_adblock, resolution_type)
-
-def puppeteer_reproduction_experiment(url, use_adblock, resolution_type, mac, server):
-    set_extension_options(EXTENSION_DB, {
-        'puppeteer': True,
-        'adblock': use_adblock,
-        'resolution_type': resolution_type,
-        'mac': mac,
-        'server_address': server,
-    })
-    return puppeteer_reproduction(url, use_adblock, resolution_type)
+    return puppeteer_navigation(url)
 
 def get_browser_experiment_func(experiment_type):
     return dict(zip(EXPERIMENT_TYPES, [
-        [selenium_navigation_experiment, puppeteer_navigation_experiment],
-        [selenium_reproduction_experiment, puppeteer_reproduction_experiment],
+        [puppeteer_navigation_experiment],
+        [selenium_reproduction_experiment],
     ]))[experiment_type]
 
 def send_results_and_delete(app, task):
