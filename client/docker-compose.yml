@@ -16,21 +16,21 @@ services:
       - data_gathering_volume:/data
   wptagent:
     image: carloscdias/wptagent
-    container_name: wpa_agent-container
+    container_name: wpt_agent-container
     environment:
-      - SERVER_URL=$SERVER_URL
+      - WPT_SERVER=$WPT_SERVER
       - LOCATION=$LOCATION
-      - KEY=$KEY
+      - WPT_KEY=$WPT_KEY
       - NAME=$NAME
       - SHAPER=$SHAPER
       - EXTRA_ARGS=$EXTRA_ARGS
-    command: python3 wptagent.py -vvvv --xvfb --dockerized --server $SERVER_URL --location $LOCATION --key $KEY
+    command: python3 wptagent.py -vvvv --xvfb --dockerized --server $WPT_SERVER --location $LOCATION --key $WPT_KEY
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: data_gathering-container wpa_agent-container
+    command: data_gathering-container wpt_agent-container
 volumes:
   data_gathering_volume:  
 

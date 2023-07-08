@@ -5,29 +5,55 @@
 BASE_DIR='/home/pi/wptagent-automation'
 
 
-MAC=$(cat /sys/class/net/*/address | head -1)
+# MAC=$(cat /sys/class/net/*/address | head -1)
+
+mac=$(ifconfig | grep ether)
+mac=${mac%%  txqueuelen*}
+mac=${mac#*ether }
+MAC=${mac//:/}
+
+set -eu
+: ${WPT_SERVER:=''}
+: ${WPT_KEY:=''}
+: ${BROKER:=''}
+: ${COLLECTION_SERVER:=''}
+: ${COLLECTION_SERVER_PORT:=''}
+
+if [ -f "$BASE_DIR/broker_url" ]; then
+    BROKER=$(cat "$BASE_DIR/broker_url")
+fi 
+while [[ $BROKER == '' ]]; do
+    read -p "Broker address: " BROKER
+done
 
 if [ -f "$BASE_DIR/collection_server_url" ]; then
-    SERVER=$(cat "$BASE_DIR/collection_server_url")
-else 
-    echo "Broker address: "
-    read SERVER
-fi
+    COLLECTION_SERVER=$(cat "$BASE_DIR/collection_server_url")
+fi 
+while [[ $COLLECTION_SERVER == '' ]]; do
+    read -p "Collection server address: " COLLECTION_SERVER
+done
+
+if [ -f "$BASE_DIR/collection_server_port" ]; then
+    COLLECTION_SERVER_PORT=$(cat "$BASE_DIR/collection_server_port")
+fi 
+while [[ $COLLECTION_SERVER_PORT == '' ]]; do
+    read -p "Collection server port: " COLLECTION_SERVER_PORT
+done
 
 if [ -f "$BASE_DIR/wptserver_url" ]; then
-    SERVER_URL=$(cat "$BASE_DIR/wptserver_url")
-else 
-    echo "WPT Server address: "
-    read SERVER_URL
+    WPT_SERVER=$(cat "$BASE_DIR/wptserver_url")
 fi
+while [[ $WPT_SERVER == '' ]]; do
+    read -p "WebPageTest server address: " WPT_SERVER
+done
 
 if [ -f "$BASE_DIR/wptagent_key" ]; then
-    KEY=$(cat "$BASE_DIR/wptagent_key")
-else 
-    echo "KEY for $SERVER_URL: "
-    read KEY
+    WPT_KEY=$(cat "$BASE_DIR/wptagent_key")
 fi
-LOCATION=""
+while [[ $WPT_KEY == '' ]]; do
+    read -p "WebPageTest agent location key for $WPT_SERVER: " WPT_KEY
+done
+
 NAME=""
 SHAPER=""
 
@@ -35,20 +61,36 @@ SHAPER=""
 if ! [ -x "$(command -v docker)" ]; then
     curl -fsSL https://get.docker.com -o - | sudo bash
 fi
+
 # create directory
 git clone --recurse-submodules -b alpha https://github.com/danielatk/wptagent-automation.git ~/data_gathering
 cd ~/data_gathering/client
+
+# modify plugin
+for file in "$extensao_coleta"/*; do
+    if [ -f "$file" ]; then
+        filedata=$(<"$file")
+
+        filedata=${filedata//'00:00:00:00:00:00'/$MAC}
+        filedata=${filedata//'0.0.0.0'/$COLLECTION_SERVER}
+        filedata=${filedata//'65535'/$COLLECTION_SERVER_PORT}
+
+        echo "$filedata" > "$file"
+    fi
+done
+
 # create .env
 touch .env
 echo "UID=1000" >> .env
 echo "QUEUE=\"mac_${MAC}\"" >> .env
-echo "BACKEND=\"rpc://guest:guest@${SERVER}/\"" >> .env
-echo "BROKER=\"amqp://guest:guest@${SERVER}/\"" >> .env
-echo "SERVER_URL=\"${SERVER_URL}\"" >> .env
-echo "LOCATION=\"${LOCATION}\"" >> .env
-echo "KEY=\"${KEY}\"" >> .env
+echo "BACKEND=\"rpc://guest:guest@${BROKER}/\"" >> .env
+echo "BROKER=\"amqp://guest:guest@${BROKER}/\"" >> .env
+echo "WPT_SERVER=\"${WPT_SERVER}\"" >> .env
+echo "LOCATION=\"${MAC}\"" >> .env
+echo "WPT_KEY=\"${WPT_KEY}\"" >> .env
 echo "NAME=\"${NAME}\"" >> .env
 echo "SHAPER=\"${SHAPER}\"" >> .env
+
 # start services
 sudo docker compose up -d --build
 echo 'Installation completed. Agent is running.'
