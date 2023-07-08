@@ -67,7 +67,7 @@ git clone --recurse-submodules -b alpha https://github.com/danielatk/wptagent-au
 cd ~/data_gathering/client
 
 # modify plugin
-for file in "$extensao_coleta"/*; do
+for file in "~/data_gathering/client/resources/extensions/ATF-chrome-plugin"/*; do
     if [ -f "$file" ]; then
         filedata=$(<"$file")
 
