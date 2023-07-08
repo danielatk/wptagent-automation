@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-#  curl -fsSL https://raw.githubusercontent.com/carloscdias/wptagent-automation/main/install.sh -o - | bash
+#  curl -fsSL https://raw.githubusercontent.com/danielatk/wptagent-automation/alpha/install.sh -o - | bash
 
 BASE_DIR='/home/pi/wptagent-automation'
 
@@ -36,7 +36,7 @@ if ! [ -x "$(command -v docker)" ]; then
     curl -fsSL https://get.docker.com -o - | sudo bash
 fi
 # create directory
-git clone --recurse-submodules https://github.com/carloscdias/wptagent-automation.git ~/data_gathering
+git clone --recurse-submodules -b alpha https://github.com/danielatk/wptagent-automation.git ~/data_gathering
 cd ~/data_gathering/client
 # create .env
 touch .env
