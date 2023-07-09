@@ -24,7 +24,7 @@ services:
       - NAME=$NAME
       - SHAPER=$SHAPER
       - EXTRA_ARGS=$EXTRA_ARGS
-    command: python3 wptagent.py -vvvv --xvfb --dockerized --server $WPT_SERVER --location $LOCATION --key $WPT_KEY
+    command: python3 wptagent.py -vvvv --xvfb --dockerized --server "${WPT_SERVER}work/" --location $LOCATION --key $WPT_KEY
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
