@@ -16,28 +16,12 @@ set -eu
 : ${WPT_SERVER:=''}
 : ${WPT_KEY:=''}
 : ${BROKER:=''}
-: ${COLLECTION_SERVER:=''}
-: ${COLLECTION_SERVER_PORT:=''}
 
 if [ -f "$BASE_DIR/broker_url" ]; then
     BROKER=$(cat "$BASE_DIR/broker_url")
 fi 
 while [[ $BROKER == '' ]]; do
     read -p "Broker address: " BROKER
-done
-
-if [ -f "$BASE_DIR/collection_server_url" ]; then
-    COLLECTION_SERVER=$(cat "$BASE_DIR/collection_server_url")
-fi 
-while [[ $COLLECTION_SERVER == '' ]]; do
-    read -p "Collection server address: " COLLECTION_SERVER
-done
-
-if [ -f "$BASE_DIR/collection_server_port" ]; then
-    COLLECTION_SERVER_PORT=$(cat "$BASE_DIR/collection_server_port")
-fi 
-while [[ $COLLECTION_SERVER_PORT == '' ]]; do
-    read -p "Collection server port: " COLLECTION_SERVER_PORT
 done
 
 if [ -f "$BASE_DIR/wptserver_url" ]; then
@@ -65,19 +49,6 @@ fi
 # create directory
 git clone --recurse-submodules -b alpha https://github.com/danielatk/wptagent-automation.git ~/data_gathering
 cd ~/data_gathering/client
-
-# modify plugin
-for file in "~/data_gathering/client/resources/extensions/ATF-chrome-plugin"/*; do
-    if [ -f "$file" ]; then
-        filedata=$(<"$file")
-
-        filedata=${filedata//'00:00:00:00:00:00'/$MAC}
-        filedata=${filedata//'0.0.0.0'/$COLLECTION_SERVER}
-        filedata=${filedata//'65535'/$COLLECTION_SERVER_PORT}
-
-        echo "$filedata" > "$file"
-    fi
-done
 
 # create .env
 touch .env
