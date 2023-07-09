@@ -8,23 +8,6 @@ from selenium.common.exceptions import NoSuchElementException, WebDriverExceptio
 import plyvel as levelDB
 
 
-def set_extension_options(database, options: dict):
-    """
-        main keys:
-        - server_address: string
-        - mac: string
-        - verbosity: string
-        - save_file: int
-    """
-    try:
-        db = levelDB.DB(database, create_if_missing=True)
-        for key, value in options.items():
-            db.put(key.encode(), json.dumps(value).encode())
-        db.close()
-    except Exception as err:
-        print(err)
-
-
 def setup_chrome():
     # opções do chrome
     chrome_options = webdriver.ChromeOptions()
