@@ -5,7 +5,7 @@ from typing import Tuple
 
 from celery.result import allow_join_result
 from data_gathering.celery import logger
-from .navigation import selenium_reproduction, set_extension_options
+from .navigation import selenium_reproduction
 from ..model import get_random_video, get_random_page, get_random_uf, save_result, remove_saved_results, get_all_saved_results
 
 VERSION_FILE = '/app/version'
@@ -86,26 +86,6 @@ def call_puppeteer(url):
 
 def puppeteer_navigation(url):
     return call_puppeteer(url)
-
-def selenium_reproduction_experiment(url, mac, server):
-    set_extension_options(EXTENSION_DB, {
-        'mac': mac,
-        'server_address': server,
-    })
-    return selenium_reproduction(url)
-
-def puppeteer_navigation_experiment(url, mac, server):
-    set_extension_options(EXTENSION_DB, {
-        'mac': mac,
-        'server_address': server,
-    })
-    return puppeteer_navigation(url)
-
-def get_browser_experiment_func(experiment_type):
-    return dict(zip(EXPERIMENT_TYPES, [
-        [puppeteer_navigation_experiment],
-        [selenium_reproduction_experiment],
-    ]))[experiment_type]
 
 def send_results_and_delete(app, task):
     saved_results = get_all_saved_results()
