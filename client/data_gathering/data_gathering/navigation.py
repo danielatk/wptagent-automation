@@ -108,13 +108,9 @@ def selenium_reproduction(url):
 
     is_first_JSON = True
 
-    index = url.find('watch?v=')
-    video_id = url[index+8:]
-
     # TODO(danielatk): write JSON with dict!
     json_stats_for_nerds = '{"st":'
     json_stats_for_nerds += str(begin_time)
-    json_stats_for_nerds += f',"id":{video_id}'
     json_stats_for_nerds += ',"vals":['
 
     settings = driver.find_elements('class name', 'ytp-settings-button')

@@ -88,7 +88,10 @@ def experimento_1(schedule_next: bool = False):
         result['browser']['navigation'][url]['data'] = puppeteer_navigation(url)
 
     # reproduction experiment
+    url = get_url_for_experiment_type('reproduction')
     result['browser']['reproduction'] = {}
+    index = url.find('watch?v=')
+    result['browser']['reproduction']['video_id'] = url[index+8:]
     result['browser']['reproduction']['started'] = now.timestamp()
     result['browser']['reproduction']['data'] = selenium_reproduction(url)
 
