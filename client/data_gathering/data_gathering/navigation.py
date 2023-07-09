@@ -14,6 +14,8 @@ EXTENSAO_COLETA = '/app/resources/extensions/ATF-chrome-plugin/'
 def setup_chrome():
     # opções do chrome
     chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--start-maximized')
+    chrome_options.add_argument(f'--disable-extensions-except={EXTENSAO_COLETA}')
     chrome_options.add_argument(f'--load-extension={EXTENSAO_COLETA}')
     chrome_options.add_argument('--user-data-dir=/data/chrome')
     chrome_options.add_argument('--profile-directory=data_gathering_agent')
