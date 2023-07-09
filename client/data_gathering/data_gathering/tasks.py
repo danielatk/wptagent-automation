@@ -83,10 +83,14 @@ def experimento_1(schedule_next: bool = False):
         url = get_url_for_experiment_type('navigation')
         unlock_chrome_profile()
         # navigation experiment
-        result['browser']['navigation'][url] = puppeteer_navigation(url)
+        result['browser']['navigation'][url] = {}
+        result['browser']['navigation'][url]['started'] = now.timestamp()
+        result['browser']['navigation'][url]['data'] = puppeteer_navigation(url)
 
     # reproduction experiment
-    result['browser']['reproduction'] = selenium_reproduction(url)
+    result['browser']['reproduction'] = {}
+    result['browser']['reproduction']['started'] = now.timestamp()
+    result['browser']['reproduction']['data'] = selenium_reproduction(url)
 
     result['ended'] = datetime.now().timestamp()
     
