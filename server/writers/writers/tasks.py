@@ -4,6 +4,29 @@ from writers.celery import app, logger, QUEUE
 
 SAVE_DIR = '/data'
 
+def save_reproduction_file(payload):
+    browser = payload['browser']
+    if 'reproduction' not in browser:
+        return
+    device = payload['mac'].replace(':', '')
+    reproduction = browser['reproduction']
+    time = int(reproduction['started'])
+    filename = f"{reproduction['video_id']}_{device}_{time}_sfn.json"
+    with open(f'{SAVE_DIR}/{filename}', 'w') as f:
+            f.writelines([json.dumps(line) for line in reproduction['data']])
+
+def save_navigation_files(payload):
+    browser = payload['browser']
+    if 'navigation' not in browser:
+        return
+    navigation = browser['navigation']
+    device = payload['mac'].replace(':', '')
+    for url in navigation.keys():
+        time = navigation[url]['started']
+        filename = f'{url}_{device}_{time}_plugin.json'
+        with open(f'{SAVE_DIR}/{filename}', 'w') as f:
+            f.writelines([json.dumps(line) for line in navigation[url]['data']])
+
 def save_ndt_file(payload):
     ndt = payload['ndt']
     device = payload['mac'].replace(':', '')
@@ -20,9 +43,8 @@ def save_ndt_file(payload):
 @app.task(name='writers.save_file')
 def save_file(payload):
     logger.info(payload)
-    # save traceroute
-    # save browser
-    # save ndt
+    save_reproduction_file(payload)
+    save_navigation_files(payload)
     save_ndt_file(payload)
 
 @app.task(name='writers.get_worker_results')
