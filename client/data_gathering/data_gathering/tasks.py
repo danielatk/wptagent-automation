@@ -76,17 +76,17 @@ def experimento_1(schedule_next: bool = False):
     # ndt
     result['ndt'] = ndt_experiment(IPV6)
     result['browser'] = {}
+    result['browser']['navigation'] = {}
     num_pages = get_number_of_pages_from_file()
     for _ in range(num_pages):
         # setup
         url = get_url_for_experiment_type('navigation')
-        result['url'] = url
         unlock_chrome_profile()
         # navigation experiment
-        result['browser']['navigation'] = selenium_reproduction(url)
+        result['browser']['navigation'][url] = puppeteer_navigation(url)
 
     # reproduction experiment
-    result['browser']['reproduction'] = puppeteer_navigation(url)
+    result['browser']['reproduction'] = selenium_reproduction(url)
 
     result['ended'] = datetime.now().timestamp()
     
