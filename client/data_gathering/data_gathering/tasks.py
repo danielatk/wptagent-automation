@@ -3,10 +3,9 @@ from datetime import datetime, timedelta
 from scipy.stats import expon
 from apscheduler.triggers.cron import CronTrigger
 from ..model import get_number_of_pages_from_file
-from ..data_gathering.utils import puppeteer_navigation
-from ..data_gathering.navigation import selenium_reproduction
-from celery import app, scheduler, logger, QUEUE, IPV6
+from ..celery import app, scheduler, logger, QUEUE, IPV6
 from .utils import *
+from .navigation import selenium_reproduction
 
 EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL = 30
 PAGES_FILE_PATH = '/app/resources/navigation_list.csv'
