@@ -10,49 +10,6 @@ from .navigation import selenium_reproduction
 EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL = 30
 PAGES_FILE_PATH = '/app/resources/navigation_list.csv'
 
-if not scheduler.running:
-    scheduler.start()
-    experimento_1(True)
-
-@app.task(name='data_gathering.send_tasks')
-@app.task(name=f'{QUEUE}.data_gathering.send_tasks')
-def send_tasks_to_server():
-    send_results_and_delete(app, 'writers.save')
-
-@app.task(name='data_gathering.ndt7')
-@app.task(name=f'{QUEUE}.data_gathering.ndt7')
-def ndt7():
-    output = call_ndt7()
-    logger.info(output)
-
-
-@app.task(name=f'{QUEUE}.data_gathering.get_version')
-def get_version():
-    return get_runtime_version()
-
-@app.task(name='data_gathering.get_queue')
-def get_queue():
-    return QUEUE
-
-@app.task(name='data_gathering.local_schedule')
-@app.task(name=f'{QUEUE}.data_gathering.local_schedule')
-def local_schedule(func: str, schedule: str, kwargs: dict):
-    FUNC_NAME_TO_FUNC = {
-        'ndt7': 'data_gathering.data_gathering.tasks:ndt7',
-        'experimento_1': 'data_gathering.data_gathering.tasks:experimento_1',
-    }
-    if func not in FUNC_NAME_TO_FUNC:
-        raise ValueError()
-    job = scheduler.add_job(FUNC_NAME_TO_FUNC[func], CronTrigger.from_crontab(schedule), kwargs=kwargs)
-    return job.id
-
-@app.task(name=f'{QUEUE}.data_gathering.get_local_schedule')
-def get_local_schedule():
-    with io.StringIO() as f:
-        scheduler.print_jobs(out=f)
-        f.seek(0)
-        return f.read()
-
 @app.task(name='data_gathering.experimento_1')
 @app.task(name=f'{QUEUE}.data_gathering.experimento_1')
 def experimento_1(schedule_next: bool = False):
@@ -107,3 +64,46 @@ def experimento_1(schedule_next: bool = False):
         logger.info(f'Next execution: {next_run}')
 
     return result
+
+if not scheduler.running:
+    scheduler.start()
+    experimento_1(True)
+
+@app.task(name='data_gathering.send_tasks')
+@app.task(name=f'{QUEUE}.data_gathering.send_tasks')
+def send_tasks_to_server():
+    send_results_and_delete(app, 'writers.save')
+
+@app.task(name='data_gathering.ndt7')
+@app.task(name=f'{QUEUE}.data_gathering.ndt7')
+def ndt7():
+    output = call_ndt7()
+    logger.info(output)
+
+
+@app.task(name=f'{QUEUE}.data_gathering.get_version')
+def get_version():
+    return get_runtime_version()
+
+@app.task(name='data_gathering.get_queue')
+def get_queue():
+    return QUEUE
+
+@app.task(name='data_gathering.local_schedule')
+@app.task(name=f'{QUEUE}.data_gathering.local_schedule')
+def local_schedule(func: str, schedule: str, kwargs: dict):
+    FUNC_NAME_TO_FUNC = {
+        'ndt7': 'data_gathering.data_gathering.tasks:ndt7',
+        'experimento_1': 'data_gathering.data_gathering.tasks:experimento_1',
+    }
+    if func not in FUNC_NAME_TO_FUNC:
+        raise ValueError()
+    job = scheduler.add_job(FUNC_NAME_TO_FUNC[func], CronTrigger.from_crontab(schedule), kwargs=kwargs)
+    return job.id
+
+@app.task(name=f'{QUEUE}.data_gathering.get_local_schedule')
+def get_local_schedule():
+    with io.StringIO() as f:
+        scheduler.print_jobs(out=f)
+        f.seek(0)
+        return f.read()
