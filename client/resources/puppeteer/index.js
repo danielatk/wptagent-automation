@@ -9,7 +9,6 @@ if (args.length === 0) {
 
 (async () => {
     const extensao_coleta = '/app/resources/extensions/ATF-chrome-plugin/'
-    const endingLog = 'saved last session stats';
     let timeoutDuration = 18000; // Timeout duration in milliseconds
 
     const browser = await puppeteer.launch({
@@ -33,14 +32,13 @@ if (args.length === 0) {
 
     let logFound = false;
 
-    let logs = [];
+    let resultLog = '';
 
     page.on('console', (msg) => {
         if (msg.text().length > 0) {
-            if (msg.text().includes(endingLog)) {
+            if (msg.text.includes('Version:')) {
+                resultLog = msg.text();
                 logFound = true;
-            } else {
-                logs.push(msg.text());
             }
         }
     });
@@ -51,13 +49,13 @@ if (args.length === 0) {
         if (logFound) {
             await page.close();
             await browser.close();
-            return logs;
+            console.log(resultLog);
         }
 
         if (timeoutDuration <= 0) {
             await page.close();
             await browser.close();
-            return logs;
+            console.log(resultLog);
         }
 
         setTimeout(async () => {
