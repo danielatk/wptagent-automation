@@ -6,6 +6,7 @@ from ..model import get_number_of_pages_from_file
 from ..celery import app, scheduler, logger, QUEUE, IPV6
 from .utils import *
 from .navigation import selenium_reproduction
+import schedule
 
 EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL = 30
 PAGES_FILE_PATH = '/app/resources/navigation_list.csv'
@@ -60,7 +61,8 @@ def experimento_1(schedule_next: bool = False):
     if schedule_next:
         time_in_minutes = expon.rvs(scale=int(EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL), size=1)[0]
         next_run = now + timedelta(minutes=time_in_minutes)
-        scheduler.add_job(experimento_1, 'date', run_date=next_run, args=[True])
+        next_run_time = next_run.strftime("%H:%M")
+        schedule.every().day.at(next_run_time).do(experimento_1, True)
         logger.info(f'Next execution: {next_run}')
 
     return result

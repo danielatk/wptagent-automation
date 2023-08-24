@@ -6,4 +6,5 @@ SQLAlchemy
 sqlalchemy-utils
 plyvel
 apscheduler
+schedule
 python-dotenv
