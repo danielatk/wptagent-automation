@@ -23,7 +23,8 @@ def save_navigation_files(payload):
     device = payload['mac'].replace(':', '')
     for url in navigation.keys():
         time = navigation[url]['started']
-        filename = f'{url}_{device}_{time}_plugin.json'
+        parsed_url = url.replace("http://", "").replace("https://", "")
+        filename = f'{parsed_url}_{device}_{time}_plugin.json'
         with open(f'{SAVE_DIR}/{filename}', 'w') as f:
             f.writelines([json.dumps(line) for line in navigation[url]['data']])
 
