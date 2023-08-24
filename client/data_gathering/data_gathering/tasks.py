@@ -14,6 +14,9 @@ PAGES_FILE_PATH = '/app/resources/navigation_list.csv'
 @app.task(name='data_gathering.experimento_1')
 @app.task(name=f'{QUEUE}.data_gathering.experimento_1')
 def experimento_1(schedule_next: bool = False):
+    # clear scheduler
+    schedule.clear()
+
     """
     Ordem de execução:
         - agenda a próxima execução do experimento de acordo com ~exp(30)
@@ -61,8 +64,7 @@ def experimento_1(schedule_next: bool = False):
     if schedule_next:
         time_in_minutes = expon.rvs(scale=int(EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL), size=1)[0]
         next_run = now + timedelta(minutes=time_in_minutes)
-        next_run_time = next_run.strftime("%H:%M")
-        schedule.every().day.at(next_run_time).do(experimento_1, True)
+        schedule.every(time_in_minutes).minute.do(experimento_1, True)
         logger.info(f'Next execution: {next_run}')
 
     return result
