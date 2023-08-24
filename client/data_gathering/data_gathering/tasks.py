@@ -69,7 +69,7 @@ def experimento_1(schedule_next: bool = True):
     if schedule_next:
         time_in_minutes = expon.rvs(scale=int(EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL), size=1)[0]
         next_run = now + timedelta(minutes=time_in_minutes)
-        schedule(2*time_in_minutes, experimento_1)
+        schedule(time_in_minutes*60, experimento_1)
         logger.info(f'Next execution: {next_run}')
 
     return result
