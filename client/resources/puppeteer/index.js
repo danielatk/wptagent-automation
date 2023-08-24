@@ -33,14 +33,14 @@ if (args.length === 0) {
 
     let logFound = false;
 
-    let logs = [];
+    let logs = '';
 
     page.on('console', (msg) => {
         if (msg.text().length > 0) {
             if (msg.text().includes(endingLog)) {
                 logFound = true;
             } else {
-                logs.push(msg.text());
+                logs = msg.text();
             }
         }
     });
@@ -51,13 +51,13 @@ if (args.length === 0) {
         if (logFound) {
             await page.close();
             await browser.close();
-            return logs;
+            console.log(logs);
         }
 
         if (timeoutDuration <= 0) {
             await page.close();
             await browser.close();
-            return logs;
+            console.log(logs);
         }
 
         setTimeout(async () => {
