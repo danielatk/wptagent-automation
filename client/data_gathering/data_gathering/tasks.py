@@ -1,22 +1,27 @@
 import io
 from datetime import datetime, timedelta
+import time
 from scipy.stats import expon
 from apscheduler.triggers.cron import CronTrigger
 from ..model import get_number_of_pages_from_file
 from ..celery import app, scheduler, logger, QUEUE, IPV6
 from .utils import *
 from .navigation import selenium_reproduction
-import schedule
+import threading
 
 EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL = 30
 PAGES_FILE_PATH = '/app/resources/navigation_list.csv'
 
+def _schedule_worker(seconds,function):
+    time.sleep(seconds)
+    function()
+
+def schedule(seconds,function):
+    threading.Thread(target=_schedule_worker,args=(seconds,function)).start()
+
 @app.task(name='data_gathering.experimento_1')
 @app.task(name=f'{QUEUE}.data_gathering.experimento_1')
-def experimento_1(schedule_next: bool = False):
-    # clear scheduler
-    schedule.clear()
-
+def experimento_1(schedule_next: bool = True):
     """
     Ordem de execução:
         - agenda a próxima execução do experimento de acordo com ~exp(30)
@@ -64,7 +69,7 @@ def experimento_1(schedule_next: bool = False):
     if schedule_next:
         time_in_minutes = expon.rvs(scale=int(EXPONENTIAL_MEAN_EXPERIMENTO_1_INTERVAL), size=1)[0]
         next_run = now + timedelta(minutes=time_in_minutes)
-        schedule.every(time_in_minutes).minute.do(experimento_1, True)
+        schedule(2*time_in_minutes, experimento_1)
         logger.info(f'Next execution: {next_run}')
 
     return result
