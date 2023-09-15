@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mac=$(ifconfig | grep ether)
+mac=$(/sbin/ifconfig | grep ether)
 mac=${mac%%  txqueuelen*}
 mac=${mac#*ether }
 mac=${mac//:/}
