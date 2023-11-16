@@ -10,7 +10,7 @@ if (args.length === 0) {
 (async () => {
     const extensao_coleta = '/home/pi/wptagent-automation/extensions/ATF-chrome-plugin/';
     const logToWaitFor = 'Data sent to collection server.';
-    let timeoutDuration = 18000; // Timeout duration in milliseconds
+    let timeoutDuration = 60000; // Timeout duration in milliseconds
 
     const browser = await puppeteer.launch({
         headless: false,
