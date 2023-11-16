@@ -1,10 +1,19 @@
 {
-	"latest_version": "1.7.0",
+	"latest_version": "1.8.0",
 	"x.y.z": {
 		"about": "Example. Leave this ALWAYS here!. INCLUDE ALL THE KEYS, EVEN WITH EMPTY ARRAYS!",
 		"fixes": ["We fixed A", "We fixed B"],
 		"improvements": [],
 		"features": ["We added C", "Now D is possible"]
+	},
+	"1.8.0": {
+		"fixes": [
+		],
+		"improvements": [
+			"We changed the timeout for each page from 18 to 60 seconds"
+		],
+		"features": [
+		]
 	},
 	"1.7.0": {
 		"fixes": [
