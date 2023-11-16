@@ -13,7 +13,7 @@ collectionServerUser=$(cat /home/pi/wptagent-automation/collection_server_user)
 collectionServerSshPort=$(cat /home/pi/wptagent-automation/collection_server_ssh_port)
 
 # Set maximum number of iterations to wait for
-max_iterations=18  # 18 * 10 seconds = 3 minutes
+max_iterations=60  # 60 * 10 seconds = 10 minutes
 
 # Initialize iteration counter
 iteration=0
