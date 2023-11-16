@@ -10,7 +10,8 @@
 		"fixes": [
 		],
 		"improvements": [
-			"We changed the timeout for each page from 18 to 60 seconds"
+			"We changed the timeout for each page from 18 to 60 seconds",
+			"We changed the ndt tests input file"
 		],
 		"features": [
 		]
