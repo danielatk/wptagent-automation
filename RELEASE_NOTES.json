@@ -11,7 +11,8 @@
 		],
 		"improvements": [
 			"We changed the timeout for each page from 18 to 60 seconds",
-			"We changed the ndt tests input file"
+			"We changed the ndt tests input file",
+			"We changed the update script timeout from 3 to 10 minutes"
 		],
 		"features": [
 		]
