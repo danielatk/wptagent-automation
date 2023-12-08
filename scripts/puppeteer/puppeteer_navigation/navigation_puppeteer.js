@@ -11,7 +11,7 @@ if (args.length === 0) {
     const extensao_coleta = '/home/pi/wptagent-automation/extensions/ATF-chrome-plugin/';
     const logToWaitFor = 'Data sent to collection server.';
     let timeoutDuration = 60000; // Timeout duration in milliseconds
-    let timeoutScroll = 10000; // Scroll timeout duration in milliseconds
+    // let timeoutScroll = 10000; // Scroll timeout duration in milliseconds
 
     const browser = await puppeteer.launch({
         headless: false,
@@ -56,27 +56,27 @@ if (args.length === 0) {
         }, 100); // Check again after 100 ms
     };
 
-    async function autoScroll(timeoutScroll){
-        await page.evaluate(async (timeoutScroll) => {
-            await new Promise((resolve) => {
-                var totalHeight = 0;
-                var distance = 100;
-                var timer = setInterval(() => {
-                    var scrollHeight = document.body.scrollHeight;
-                    window.scrollBy(0, distance);
-                    totalHeight += distance;
-                    timeoutScroll -= 100
+    // async function autoScroll(timeoutScroll){
+    //     await page.evaluate(async (timeoutScroll) => {
+    //         await new Promise((resolve) => {
+    //             var totalHeight = 0;
+    //             var distance = 100;
+    //             var timer = setInterval(() => {
+    //                 var scrollHeight = document.body.scrollHeight;
+    //                 window.scrollBy(0, distance);
+    //                 totalHeight += distance;
+    //                 timeoutScroll -= 100
 
-                    if(totalHeight >= scrollHeight - window.innerHeight || timeoutScroll <= 0){
-                        console.log('reached');
-                        clearInterval(timer);
-                        resolve();
-                    }
-                }, 100);
-            });
-        }, timeoutScroll);  // pass maxScrolls to the function
-    }
+    //                 if(totalHeight >= scrollHeight - window.innerHeight || timeoutScroll <= 0){
+    //                     console.log('reached');
+    //                     clearInterval(timer);
+    //                     resolve();
+    //                 }
+    //             }, 100);
+    //         });
+    //     }, timeoutScroll);  // pass maxScrolls to the function
+    // }
 
     waitForLog();
-    autoScroll(timeoutScroll);
+    // autoScroll(timeoutScroll);
 })();
